@@ -59,7 +59,7 @@ const ProfileCompletionPopup = ({ user, onComplete, onClose }) => {
      console.log("formdata", formData);
 
 const response = await axios.patch(
-    'https://career-counselling-gray.vercel.app/api/users/completeProfile',
+    'https://careercounselling-production-725b.up.railway.app/api/users/completeProfile',
     {
         ...formData,
         profileCompleted: true,

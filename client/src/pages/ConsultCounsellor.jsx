@@ -19,7 +19,7 @@ const ConsultCounsellor = () => {
     const fetchCounsellors = async () => {
       try {
         setLoading(true)
-       const response = await fetch("https://career-counselling-gray.vercel.app/api/users/counsellors/all");
+       const response = await fetch("https://careercounselling-production-725b.up.railway.app/api/users/counsellors/all");
 
         if (!response.ok) {
           throw new Error("Failed to fetch counsellors")

@@ -19,7 +19,7 @@ function Select() {
     e.preventDefault();
 
     try {
-      const response = await fetch("https://career-counselling-gray.vercel.app/api/interviews/start", {
+      const response = await fetch("https://careercounselling-production-725b.up.railway.app/api/interviews/start", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

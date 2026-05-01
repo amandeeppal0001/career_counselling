@@ -53,7 +53,7 @@ function ChatPanel() {
 
     try {
       const resultResponse= await fetch(
-        "https://career-counselling-gray.vercel.app/api/interviews/evaluate",
+        "https://careercounselling-production-725b.up.railway.app/api/interviews/evaluate",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -93,7 +93,7 @@ function ChatPanel() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        "https://career-counselling-gray.vercel.app/api/interviews/summary",
+        "https://careercounselling-production-725b.up.railway.app/api/interviews/summary",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

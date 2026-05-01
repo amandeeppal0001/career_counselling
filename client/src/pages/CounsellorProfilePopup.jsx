@@ -130,7 +130,7 @@ const CounsellorProfilePopup = ({ user, onComplete, onClose }) => {
     console.log("Counsellor payload:", payload);
 
     const response = await fetch(
-      "https://career-counselling-gray.vercel.app/api/users/complete-counsellor-profile",
+      "https://careercounselling-production-725b.up.railway.app/api/users/complete-counsellor-profile",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

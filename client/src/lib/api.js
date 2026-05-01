@@ -1,6 +1,6 @@
 
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://career-counselling-gray.vercel.app"
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://careercounselling-production-725b.up.railway.app"
 
 class ApiClient {
   constructor() {

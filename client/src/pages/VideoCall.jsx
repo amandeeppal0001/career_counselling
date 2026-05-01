@@ -19,7 +19,7 @@ const VideoCall = () => {
 
   useEffect(() => {
     let isMounted = true;
-    const socket = io('https://career-counselling-gray.vercel.app');
+    const socket = io('https://careercounselling-production-725b.up.railway.app');
     socketRef.current = socket;
     const myId = myIdRef.current;
 

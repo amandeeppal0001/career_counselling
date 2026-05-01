@@ -30,7 +30,7 @@ export default function LandingPage() {
         }
 
         try {
-                   const res = await axios.post("https://career-counselling-gray.vercel.app/api/users/login", {
+                   const res = await axios.post("https://careercounselling-production-725b.up.railway.app/api/users/login", {
             email,
             password,
         }, {
@@ -64,7 +64,7 @@ export default function LandingPage() {
         }
 
         try {
-         const res = await axios.post("https://career-counselling-gray.vercel.app/api/users/signup", {
+         const res = await axios.post("https://careercounselling-production-725b.up.railway.app/api/users/signup", {
             name,
             email,
             password,

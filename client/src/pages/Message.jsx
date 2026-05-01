@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 
-const socket = io('https://careercounselling-production-725b.up.railway.app');
+const SOCKET_URL = 'https://careercounselling-production-725b.up.railway.app';
 
 function Message({ user: propUser }) {
   const { id: otherUserId } = useParams();
@@ -15,6 +15,7 @@ function Message({ user: propUser }) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
+  const socketRef = useRef(null);
 
   useEffect(() => {
     if (!user) {
@@ -22,11 +23,12 @@ function Message({ user: propUser }) {
       return;
     }
 
-    socket.emit('join-chat', user._id);
+    socketRef.current = io(SOCKET_URL);
+    socketRef.current.emit('join-chat', user._id);
 
     const fetchHistory = async () => {
       try {
-        const response = await fetch(`https://careercounselling-production-725b.up.railway.app/api/messages/history/${user._id}/${otherUserId}`);
+        const response = await fetch(`${SOCKET_URL}/api/messages/history/${user._id}/${otherUserId}`);
         if (response.ok) {
           const data = await response.json();
           setMessages(data);
@@ -48,12 +50,13 @@ function Message({ user: propUser }) {
       setMessages((prev) => [...prev, message]);
     };
 
-    socket.on('receive-message', handleReceive);
-    socket.on('message-sent', handleSent);
+    socketRef.current.on('receive-message', handleReceive);
+    socketRef.current.on('message-sent', handleSent);
 
     return () => {
-      socket.off('receive-message', handleReceive);
-      socket.off('message-sent', handleSent);
+      socketRef.current.off('receive-message', handleReceive);
+      socketRef.current.off('message-sent', handleSent);
+      socketRef.current.disconnect();
     };
   }, [user, otherUserId, navigate]);
 
@@ -65,7 +68,7 @@ function Message({ user: propUser }) {
     e.preventDefault();
     if (!newMessage.trim()) return;
 
-    socket.emit('send-message', {
+    socketRef.current.emit('send-message', {
       sender: user._id,
       receiver: otherUserId,
       text: newMessage

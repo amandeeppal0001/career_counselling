@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:5002');
+const socket = io('https://career-counselling-gray.vercel.app');
 
 function Message({ user: propUser }) {
   const { id: otherUserId } = useParams();
@@ -26,7 +26,7 @@ function Message({ user: propUser }) {
 
     const fetchHistory = async () => {
       try {
-        const response = await fetch(`http://localhost:5002/api/messages/history/${user._id}/${otherUserId}`);
+        const response = await fetch(`https://career-counselling-gray.vercel.app/api/messages/history/${user._id}/${otherUserId}`);
         if (response.ok) {
           const data = await response.json();
           setMessages(data);

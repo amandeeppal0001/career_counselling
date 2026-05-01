@@ -40,7 +40,7 @@ const BookAppointment = () => {
   useEffect(() => {
     const fetchCounsellorDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5002/api/counsellors/${counsellorId}`)
+        const response = await fetch(`https://career-counselling-gray.vercel.app/api/counsellors/${counsellorId}`)
         if (response.ok) {
           const data = await response.json()
           setCounsellor(data)
@@ -76,7 +76,7 @@ const BookAppointment = () => {
         status: "pending"
       }
 
-      const response = await fetch("http://localhost:5002/api/appointments/book", {
+      const response = await fetch("https://career-counselling-gray.vercel.app/api/appointments/book", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

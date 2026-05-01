@@ -49,7 +49,7 @@ const CounsellorDashboard = ({ onLogout }) => {
       try {
         console.log("Fetching counsellor profile for userId:", user._id)
 
-        const response = await fetch(`http://localhost:5002/api/users/counsellor-profile/${user._id}`)
+        const response = await fetch(`https://career-counselling-gray.vercel.app/api/users/counsellor-profile/${user._id}`)
         console.log("Fetch response status:", response.status)
 
         if (!response.ok) {
@@ -77,7 +77,7 @@ const CounsellorDashboard = ({ onLogout }) => {
 
     const fetchAppointments = async () => {
       try {
-        const response = await fetch(`http://localhost:5002/api/appointments/counselor/${user._id}`)
+        const response = await fetch(`https://career-counselling-gray.vercel.app/api/appointments/counselor/${user._id}`)
         if (response.ok) {
           const data = await response.json()
           setAppointments(data)
@@ -89,7 +89,7 @@ const CounsellorDashboard = ({ onLogout }) => {
 
     const fetchConversations = async () => {
       try {
-        const response = await fetch(`http://localhost:5002/api/messages/conversations/${user._id}`)
+        const response = await fetch(`https://career-counselling-gray.vercel.app/api/messages/conversations/${user._id}`)
         if (response.ok) {
           const data = await response.json()
           setConversations(data)
@@ -118,7 +118,7 @@ const CounsellorDashboard = ({ onLogout }) => {
   const handleCancelAppointment = async (id) => {
     if (!window.confirm("Are you sure you want to cancel this appointment?")) return;
     try {
-      const res = await fetch(`http://localhost:5002/api/appointments/cancel/${id}`, { method: 'PUT' });
+      const res = await fetch(`https://career-counselling-gray.vercel.app/api/appointments/cancel/${id}`, { method: 'PUT' });
       if (res.ok) {
         setAppointments(prev => prev.map(app => app._id === id ? { ...app, status: 'Cancelled' } : app));
         alert("Appointment cancelled successfully");
@@ -133,7 +133,7 @@ const CounsellorDashboard = ({ onLogout }) => {
   const handleRescheduleSubmit = async (e, id) => {
     e.preventDefault();
     try {
-      const res = await fetch(`http://localhost:5002/api/appointments/reschedule/${id}`, {
+      const res = await fetch(`https://career-counselling-gray.vercel.app/api/appointments/reschedule/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date: rescheduleData.date, time: rescheduleData.time })

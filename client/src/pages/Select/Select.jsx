@@ -19,7 +19,7 @@ function Select() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5002/api/interviews/start", {
+      const response = await fetch("https://career-counselling-gray.vercel.app/api/interviews/start", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

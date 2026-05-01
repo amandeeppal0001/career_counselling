@@ -19,7 +19,7 @@ const VideoCall = () => {
 
   useEffect(() => {
     let isMounted = true;
-    const socket = io('http://localhost:5002');
+    const socket = io('https://career-counselling-gray.vercel.app');
     socketRef.current = socket;
     const myId = myIdRef.current;
 

@@ -496,8 +496,8 @@ const CounsellorDashboard = ({ onLogout }) => {
                         {appointment.mode === 'Online' && (
                           <button
                             onClick={() => navigate(`/video-call/${appointment._id}`)}
-                            disabled={!isCallActive(appointment.appointmentTime)}
-                            className={`px-4 py-2 rounded-lg transition-colors font-semibold flex items-center justify-center shadow-md ${isCallActive(appointment.appointmentTime) ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                            disabled={isCallActive(appointment.appointmentTime)}
+                            className={`px-4 py-2 rounded-lg transition-colors font-semibold flex items-center justify-center shadow-md ${!isCallActive(appointment.appointmentTime) ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
                             title={!isCallActive(appointment.appointmentTime) ? `Call starts 5 mins before ${new Date(appointment.appointmentTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : ''}
                           >
                             <span className="mr-2">🎥</span> Join Call

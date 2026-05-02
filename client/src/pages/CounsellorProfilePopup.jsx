@@ -118,44 +118,44 @@ const CounsellorProfilePopup = ({ user, onComplete, onClose }) => {
     }
   }
 
- const handleSubmit = async () => {
-  setIsSubmitting(true)
-  try {
-    const payload = {
-      userId: user._id,
-      ...formData,
-      experience: Number(formData.experience),
-      consultationFee: Number(formData.consultationFee),
-      profileCompleted: true,
-    };
+  const handleSubmit = async () => {
+    setIsSubmitting(true)
+    try {
+      const payload = {
+        userId: user._id,
+        ...formData,
+        experience: Number(formData.experience),
+        consultationFee: Number(formData.consultationFee),
+        profileCompleted: true,
+      };
 
-    console.log("Counsellor payload:", payload);
+      console.log("Counsellor payload:", payload);
 
-    const response = await fetch(
-      "https://career-counselling-nr04.onrender.com/api/users/complete-counsellor-profile",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+      const response = await fetch(
+        "https://career-counselling-nr04.onrender.com/api/users/complete-counsellor-profile",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (response.ok) {
+        const profileData = await response.json();
+        onComplete(profileData);
+      } else {
+        const err = await response.json();
+        console.error("Failed to save counsellor profile:", err);
+        alert("Failed to save profile. Check console for details.");
+        setIsSubmitting(false)
       }
-    );
-
-    if (response.ok) {
-      const profileData = await response.json();
-      onComplete(profileData);
-    } else {
-      const err = await response.json();
-      console.error("Failed to save counsellor profile:", err);
-      alert("Failed to save profile. Check console for details.");
+    } catch (error) {
+      console.error("Error saving counsellor profile:", error);
+      alert("Error saving profile. Please try again.");
       setIsSubmitting(false)
     }
-  } catch (error) {
-    console.error("Error saving counsellor profile:", error);
-    alert("Error saving profile. Please try again.");
-    setIsSubmitting(false)
-  }
-};
-
+  };
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -179,7 +179,7 @@ const CounsellorProfilePopup = ({ user, onComplete, onClose }) => {
                 value={formData.location}
                 onChange={(e) => handleInputChange("location", e.target.value)}
                 className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="City, State (e.g., Mumbai, Maharashtra)"
+                placeholder="City, State"
               />
             </div>
             <div>
@@ -189,7 +189,7 @@ const CounsellorProfilePopup = ({ user, onComplete, onClose }) => {
                 value={formData.phoneNumber}
                 onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
                 className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="+91 9876543210"
+                placeholder="Enter your contact number"
               />
             </div>
           </div>
@@ -197,168 +197,155 @@ const CounsellorProfilePopup = ({ user, onComplete, onClose }) => {
 
       case 1: 
         return (
-          <div className="space-y-8">
+          <div className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">Primary Specialization *</label>
-              <div className="grid grid-cols-2 gap-3">
-                {specializationOptions.map((spec) => (
-                  <button
-                    key={spec}
-                    type="button"
-                    onClick={() => handleInputChange("specialization", spec)}
-                    className={`p-3 text-sm rounded-xl border-2 transition-all ${
-                      formData.specialization === spec
-                        ? "bg-blue-500 text-white border-blue-500 shadow-lg"
-                        : "bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50"
-                    }`}
-                  >
-                    {spec}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">Years of Experience *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Experience (Years) *</label>
               <input
                 type="number"
                 value={formData.experience}
                 onChange={(e) => handleInputChange("experience", e.target.value)}
                 className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Enter years of experience"
-                min="0"
-                max="50"
+                placeholder="e.g. 5"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-4">Qualifications (Select multiple)</label>
-              <div className="grid grid-cols-2 gap-3">
-                {qualificationOptions.map((qual) => (
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Qualifications *</label>
+              <div className="grid grid-cols-2 gap-2">
+                {qualificationOptions.map((opt) => (
                   <button
-                    key={qual}
+                    key={opt}
                     type="button"
-                    onClick={() => handleMultiSelect("qualifications", qual)}
+                    onClick={() => handleMultiSelect("qualifications", opt)}
                     className={`p-3 text-sm rounded-xl border-2 transition-all ${
-                      formData.qualifications.includes(qual)
-                        ? "bg-green-500 text-white border-green-500 shadow-lg"
-                        : "bg-white text-gray-700 border-gray-200 hover:border-green-300 hover:bg-green-50"
+                      formData.qualifications.includes(opt)
+                        ? "bg-blue-500 text-white border-blue-500 shadow-lg"
+                        : "bg-white text-gray-700 border-gray-200 hover:border-blue-300"
                     }`}
                   >
-                    {qual}
+                    {opt}
                   </button>
                 ))}
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Bio / Professional Summary *</label>
+              <textarea
+                value={formData.bio}
+                onChange={(e) => handleInputChange("bio", e.target.value)}
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 transition-all"
+                placeholder="Tell students about your expertise..."
+                rows="4"
+              />
             </div>
           </div>
         )
 
       case 2: 
         return (
-          <div className="space-y-8">
+          <div className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-4">
-                Areas of Expertise (Select multiple)
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {expertiseOptions.map((expertise) => (
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Primary Specialization *</label>
+              <select
+                value={formData.specialization}
+                onChange={(e) => handleInputChange("specialization", e.target.value)}
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Specialization</option>
+                {specializationOptions.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Areas of Expertise *</label>
+              <div className="grid grid-cols-2 gap-2">
+                {expertiseOptions.map((opt) => (
                   <button
-                    key={expertise}
+                    key={opt}
                     type="button"
-                    onClick={() => handleMultiSelect("expertise", expertise)}
+                    onClick={() => handleMultiSelect("expertise", opt)}
                     className={`p-3 text-sm rounded-xl border-2 transition-all ${
-                      formData.expertise.includes(expertise)
+                      formData.expertise.includes(opt)
                         ? "bg-purple-500 text-white border-purple-500 shadow-lg"
-                        : "bg-white text-gray-700 border-gray-200 hover:border-purple-300 hover:bg-purple-50"
+                        : "bg-white text-gray-700 border-gray-200 hover:border-purple-300"
                     }`}
                   >
-                    {expertise}
+                    {opt}
                   </button>
                 ))}
               </div>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">Professional Bio *</label>
-              <textarea
-                value={formData.bio}
-                onChange={(e) => handleInputChange("bio", e.target.value)}
-                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Tell students about your background, approach, and how you can help them..."
-                rows="4"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">Consultation Fee (per session) *</label>
-              <input
-                type="number"
-                value={formData.consultationFee}
-                onChange={(e) => handleInputChange("consultationFee", e.target.value)}
-                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Enter fee in rupees"
-                min="0"
-              />
             </div>
           </div>
         )
 
       case 3: 
         return (
-          <div className="space-y-8">
+          <div className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-4">Available Days (Select multiple)</label>
-              <div className="grid grid-cols-2 gap-3">
-                {dayOptions.map((day) => (
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Consultation Fee ($/hr) *</label>
+              <input
+                type="number"
+                value={formData.consultationFee}
+                onChange={(e) => handleInputChange("consultationFee", e.target.value)}
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g. 50"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Available Days *</label>
+              <div className="flex flex-wrap gap-2">
+                {dayOptions.map((opt) => (
                   <button
-                    key={day}
+                    key={opt}
                     type="button"
-                    onClick={() => handleMultiSelect("availability.days", day)}
-                    className={`p-3 text-sm rounded-xl border-2 transition-all ${
-                      formData.availability.days.includes(day)
+                    onClick={() => handleMultiSelect("availability.days", opt)}
+                    className={`px-4 py-2 text-sm rounded-full border-2 transition-all ${
+                      formData.availability.days.includes(opt)
+                        ? "bg-green-500 text-white border-green-500 shadow-lg"
+                        : "bg-white text-gray-700 border-gray-200 hover:border-green-300"
+                    }`}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Available Time Slots *</label>
+              <div className="grid grid-cols-3 gap-2">
+                {timeSlotOptions.map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => handleMultiSelect("availability.timeSlots", opt)}
+                    className={`p-2 text-xs rounded-lg border-2 transition-all ${
+                      formData.availability.timeSlots.includes(opt)
                         ? "bg-orange-500 text-white border-orange-500 shadow-lg"
-                        : "bg-white text-gray-700 border-gray-200 hover:border-orange-300 hover:bg-orange-50"
+                        : "bg-white text-gray-700 border-gray-200 hover:border-orange-300"
                     }`}
                   >
-                    {day}
+                    {opt}
                   </button>
                 ))}
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-4">
-                Available Time Slots (Select multiple)
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {timeSlotOptions.map((slot) => (
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Languages *</label>
+              <div className="flex flex-wrap gap-2">
+                {languageOptions.map((opt) => (
                   <button
-                    key={slot}
+                    key={opt}
                     type="button"
-                    onClick={() => handleMultiSelect("availability.timeSlots", slot)}
-                    className={`p-3 text-sm rounded-xl border-2 transition-all ${
-                      formData.availability.timeSlots.includes(slot)
-                        ? "bg-pink-500 text-white border-pink-500 shadow-lg"
-                        : "bg-white text-gray-700 border-gray-200 hover:border-pink-300 hover:bg-pink-50"
+                    onClick={() => handleMultiSelect("languages", opt)}
+                    className={`px-3 py-1 text-sm rounded-lg border-2 transition-all ${
+                      formData.languages.includes(opt)
+                        ? "bg-indigo-500 text-white border-indigo-500 shadow-lg"
+                        : "bg-white text-gray-700 border-gray-200 hover:border-indigo-300"
                     }`}
                   >
-                    {slot}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-4">
-                Languages Spoken (Select multiple)
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {languageOptions.map((language) => (
-                  <button
-                    key={language}
-                    type="button"
-                    onClick={() => handleMultiSelect("languages", language)}
-                    className={`p-3 text-sm rounded-xl border-2 transition-all ${
-                      formData.languages.includes(language)
-                        ? "bg-teal-500 text-white border-teal-500 shadow-lg"
-                        : "bg-white text-gray-700 border-gray-200 hover:border-teal-300 hover:bg-teal-50"
-                    }`}
-                  >
-                    {language}
+                    {opt}
                   </button>
                 ))}
               </div>
@@ -376,95 +363,93 @@ const CounsellorProfilePopup = ({ user, onComplete, onClose }) => {
       case 0:
         return formData.fullName && formData.location && formData.phoneNumber
       case 1:
-        return formData.specialization && formData.experience && formData.qualifications.length > 0
+        return formData.experience && formData.qualifications.length > 0 && formData.bio
       case 2:
-        return formData.expertise.length > 0 && formData.bio && formData.consultationFee
+        return formData.specialization && formData.expertise.length > 0
       case 3:
-        return (
-          formData.availability.days.length > 0 &&
-          formData.availability.timeSlots.length > 0 &&
-          formData.languages.length > 0
-        )
+        return formData.consultationFee && formData.availability.days.length > 0 && formData.availability.timeSlots.length > 0
       default:
         return false
     }
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all">
         {}
-        <div className="p-8 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+        <div className="p-8 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50 sticky top-0 z-10">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Complete Your Counsellor Profile</h2>
-              <p className="text-gray-600">Help students find the right guidance they need</p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Counsellor Onboarding</h2>
+              <p className="text-gray-600">Complete your profile to start helping students</p>
             </div>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-3xl font-light transition-colors"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-3xl font-light transition-colors p-2">
               ×
             </button>
           </div>
 
           {}
-          <div className="mt-6">
-            <div className="flex items-center justify-between mb-2">
+          <div className="mt-8">
+            <div className="flex items-center justify-between mb-4 relative">
+              <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-200 -translate-y-1/2 z-0"></div>
               {steps.map((step, index) => (
-                <div key={index} className="flex items-center">
+                <div key={index} className="relative z-10">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
-                      index <= currentStep ? "bg-blue-500 text-white shadow-lg" : "bg-gray-200 text-gray-500"
+                    className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+                      index <= currentStep ? "bg-blue-600 text-white shadow-lg scale-110" : "bg-white text-gray-400 border-2 border-gray-200"
                     }`}
                   >
                     {index + 1}
                   </div>
-                  {index < steps.length - 1 && (
-                    <div
-                      className={`w-16 h-1 mx-2 rounded-full transition-all ${
-                        index < currentStep ? "bg-blue-500" : "bg-gray-200"
-                      }`}
-                    />
-                  )}
                 </div>
               ))}
+              <div
+                className="absolute top-1/2 left-0 h-1 bg-blue-600 -translate-y-1/2 transition-all duration-500 z-0"
+                style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
+              ></div>
             </div>
-            <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-900">{steps[currentStep].title}</h3>
-              <p className="text-sm text-gray-600">{steps[currentStep].subtitle}</p>
+            <div className="text-center mt-6">
+              <h3 className="text-xl font-bold text-gray-900">{steps[currentStep].title}</h3>
+              <p className="text-sm text-gray-500">{steps[currentStep].subtitle}</p>
             </div>
           </div>
         </div>
 
         {}
-        <div className="p-8">{renderStepContent()}</div>
+        <div className="p-8 min-h-[400px]">{renderStepContent()}</div>
 
         {}
-        <div className="p-8 border-t border-gray-200 bg-gray-50 flex justify-between">
+        <div className="p-8 border-t border-gray-100 bg-gray-50 flex justify-between sticky bottom-0">
           <button
             onClick={handlePrevious}
             disabled={currentStep === 0}
-            className="px-6 py-3 text-gray-600 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
+            className="px-6 py-3 text-gray-600 bg-white border-2 border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold"
           >
-            Previous
+            Back
           </button>
 
           {currentStep === steps.length - 1 ? (
             <button
               onClick={handleSubmit}
               disabled={isSubmitting || !isStepValid()}
-              className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-10 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all font-bold disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? "Completing..." : "Complete Profile"}
+              {isSubmitting ? (
+                <span className="flex items-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Saving...
+                </span>
+              ) : (
+                "Finish & Go to Dashboard"
+              )}
             </button>
           ) : (
             <button
               onClick={handleNext}
               disabled={!isStepValid()}
-              className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
+              className="px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold shadow-md hover:shadow-lg"
             >
-              Next Step
+              Continue
             </button>
           )}
         </div>

@@ -34,19 +34,17 @@ const BookAppointment = () => {
     for (let i = 0; i <= 10; i++) {
       const date = new Date(today)
       date.setDate(today.getDate() + i)
-
-
-      if (date.getDay() !== 0 && date.getDay() !== 6) {
-        dates.push(date.toISOString().split('T')[0])
-      }
+      dates.push(date.toISOString().split("T")[0])
     }
     return dates
   }
 
   useEffect(() => {
-    const fetchCounsellorDetails = async () => {
+    const fetchCounsellor = async () => {
       try {
-        const response = await fetch(`https://career-counselling-nr04.onrender.com/api/counsellors/${counsellorId}`)
+        const response = await fetch(`https://career-counselling-nr04.onrender.com/api/users/counsellors/${counsellorId}`, {
+          credentials: "include"
+        })
         if (response.ok) {
           const data = await response.json()
           setCounsellor(data)
@@ -59,13 +57,13 @@ const BookAppointment = () => {
     }
 
     if (counsellorId) {
-      fetchCounsellorDetails()
+      fetchCounsellor()
     }
   }, [counsellorId])
 
   const handleBooking = async () => {
-    if (!selectedDate || !selectedTime || !sessionType) {
-      alert("Please fill in all required fields")
+    if (!selectedDate || !selectedTime) {
+      alert("Please select both date and time")
       return
     }
 
@@ -87,6 +85,7 @@ const BookAppointment = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(appointmentData)
       })
 
@@ -130,8 +129,7 @@ const BookAppointment = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-        <span className="ml-3 text-lg text-gray-600">Loading...</span>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     )
   }
@@ -159,159 +157,148 @@ const BookAppointment = () => {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {}
-          {counsellor && (
-            <div className="bg-white rounded-2xl shadow-lg p-6">
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="md:flex">
+            {}
+            <div className="md:w-1/3 bg-gray-50 p-8 border-r border-gray-200">
               <div className="text-center mb-6">
-                <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-3xl">👨‍💼</span>
+                <div className="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-4xl">👨‍🏫</span>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">{counsellor.fullName}</h2>
-                <p className="text-purple-600 font-medium">{counsellor.specialization}</p>
-                <div className="flex items-center justify-center mt-2">
-                  <div className="flex text-yellow-400">
-                    {'★★★★★'.slice(0, Math.floor(counsellor.rating || 4.5))}
-                  </div>
-                  <span className="ml-2 text-gray-600">
-                    {counsellor.rating || 4.5} ({counsellor.reviewsCount || 12} reviews)
-                  </span>
-                </div>
+                <h2 className="text-xl font-bold text-gray-900">{counsellor?.fullName}</h2>
+                <p className="text-purple-600 font-medium">{counsellor?.specialization}</p>
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <span className="text-purple-600">🎓</span>
-                  <span className="text-gray-700">{counsellor.experience} years experience</span>
+                <div className="flex items-center gap-3 text-sm text-gray-600">
+                  <span className="text-lg">🎓</span>
+                  <span>{counsellor?.experience} Experience</span>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <span className="text-purple-600">💰</span>
-                  <span className="text-gray-700">₹{counsellor.consultationFee || 500} per session</span>
+                <div className="flex items-center gap-3 text-sm text-gray-600">
+                  <span className="text-lg">🌐</span>
+                  <span>{counsellor?.languages?.join(", ")}</span>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <span className="text-purple-600">⏰</span>
-                  <span className="text-gray-700">{counsellor.sessionDuration || 45} minutes</span>
+                <div className="pt-4 border-t border-gray-200">
+                  <p className="text-xs text-gray-500 uppercase font-bold mb-2">About</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">{counsellor?.bio}</p>
                 </div>
               </div>
             </div>
-          )}
 
-          {}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-6">Schedule Your Session</h3>
+            {}
+            <div className="md:w-2/3 p-8">
+              <div className="space-y-8">
+                {}
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm">1</span>
+                    Select Date
+                  </h3>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                    {getAvailableDates().map((date) => {
+                      const d = new Date(date)
+                      return (
+                        <button
+                          key={date}
+                          onClick={() => setSelectedDate(date)}
+                          className={`p-3 rounded-xl border-2 transition-all text-center ${
+                            selectedDate === date
+                              ? "bg-blue-600 border-blue-600 text-white shadow-md"
+                              : "border-gray-100 hover:border-blue-300 hover:bg-blue-50"
+                          }`}
+                        >
+                          <p className="text-xs font-bold uppercase">{d.toLocaleDateString('en-US', { weekday: 'short' })}</p>
+                          <p className="text-lg font-bold">{d.getDate()}</p>
+                          <p className="text-[10px] uppercase">{d.toLocaleDateString('en-US', { month: 'short' })}</p>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
 
-            <div className="space-y-6">
-              {}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Date *
-                </label>
-                <select
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  required
-                >
-                  <option value="">Choose a date</option>
-                  {getAvailableDates().map(date => {
-                    const dateObj = new Date(date)
-                    const formattedDate = dateObj.toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })
-                    return (
-                      <option key={date} value={date}>{formattedDate}</option>
-                    )
-                  })}
-                </select>
-              </div>
+                {}
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm">2</span>
+                    Select Time
+                  </h3>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    {timeSlots.map((time) => (
+                      <button
+                        key={time}
+                        onClick={() => setSelectedTime(time)}
+                        className={`p-3 rounded-xl border-2 transition-all text-sm font-medium ${
+                          selectedTime === time
+                            ? "bg-blue-600 border-blue-600 text-white shadow-md"
+                            : "border-gray-100 hover:border-blue-300 hover:bg-blue-50"
+                        }`}
+                      >
+                        {time}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-              {}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Time *
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {timeSlots.map(time => (
+                {}
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm">3</span>
+                    Session Type
+                  </h3>
+                  <div className="flex gap-4">
                     <button
-                      key={time}
-                      onClick={() => setSelectedTime(time)}
-                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                        selectedTime === time
-                          ? "bg-purple-600 text-white"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      onClick={() => setSessionType("video")}
+                      className={`flex-1 p-4 rounded-xl border-2 transition-all flex items-center justify-center gap-2 ${
+                        sessionType === "video"
+                          ? "bg-purple-50 border-purple-600 text-purple-700"
+                          : "border-gray-100 hover:border-purple-300"
                       }`}
                     >
-                      {time}
+                      <span className="text-xl">📹</span>
+                      <span className="font-bold">Video Call</span>
                     </button>
-                  ))}
+                    <button
+                      onClick={() => setSessionType("chat")}
+                      className={`flex-1 p-4 rounded-xl border-2 transition-all flex items-center justify-center gap-2 ${
+                        sessionType === "chat"
+                          ? "bg-blue-50 border-blue-600 text-blue-700"
+                          : "border-gray-100 hover:border-blue-300"
+                      }`}
+                    >
+                      <span className="text-xl">💬</span>
+                      <span className="font-bold">Chat</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              {}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Session Type *
-                </label>
-                <div className="grid grid-cols-2 gap-4">
-                  <button
-                    onClick={() => setSessionType("video")}
-                    className={`p-4 rounded-lg border-2 transition-colors ${
-                      sessionType === "video"
-                        ? "border-purple-600 bg-purple-50 text-purple-700"
-                        : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
-                    }`}
-                  >
-                    <div className="text-2xl mb-2">🎥</div>
-                    <div className="font-medium">Video Call</div>
-                    <div className="text-sm text-gray-500">Face-to-face online session</div>
-                  </button>
-                  <button
-                    onClick={() => setSessionType("phone")}
-                    className={`p-4 rounded-lg border-2 transition-colors ${
-                      sessionType === "phone"
-                        ? "border-purple-600 bg-purple-50 text-purple-700"
-                        : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
-                    }`}
-                  >
-                    <div className="text-2xl mb-2">📞</div>
-                    <div className="font-medium">Phone Call</div>
-                    <div className="text-sm text-gray-500">Audio-only session</div>
-                  </button>
+                {}
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+                    <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm">4</span>
+                    Message for Counsellor (Optional)
+                  </h3>
+                  <textarea
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Briefly describe what you'd like to discuss..."
+                    className="w-full p-4 border-2 border-gray-100 rounded-xl focus:border-blue-600 outline-none min-h-[100px] transition-all"
+                  />
                 </div>
-              </div>
 
-              {}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Additional Message (Optional)
-                </label>
-                <textarea
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  rows={4}
-                  placeholder="Tell the counsellor about your specific concerns or goals for this session..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-                />
-              </div>
-
-              {}
-              <button
-                onClick={handleBooking}
-                disabled={isBooking || !selectedDate || !selectedTime}
-                className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 ${
-                  isBooking || !selectedDate || !selectedTime
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 shadow-md hover:shadow-lg"
-                }`}
-              >
-                {isBooking ? "Booking..." : "Book Appointment"}
-              </button>
-
-              <div className="text-center text-sm text-gray-500">
-                <p>💡 You will receive a confirmation email with session details</p>
+                <button
+                  onClick={handleBooking}
+                  disabled={isBooking || !selectedDate || !selectedTime}
+                  className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transform transition-all hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                >
+                  {isBooking ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Confirming...
+                    </span>
+                  ) : (
+                    "Confirm Booking"
+                  )}
+                </button>
               </div>
             </div>
           </div>

@@ -25,7 +25,9 @@ const ConsultCounsellor = () => {
     const fetchCounsellors = async () => {
       try {
         setLoading(true)
-       const response = await fetch("https://career-counselling-nr04.onrender.com/api/users/counsellors/all");
+        const response = await fetch("https://career-counselling-nr04.onrender.com/api/users/counsellors/all", {
+          credentials: "include"
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch counsellors")

@@ -28,7 +28,9 @@ function Message({ user: propUser }) {
 
     const fetchHistory = async () => {
       try {
-        const response = await fetch(`${SOCKET_URL}/api/messages/history/${user._id}/${otherUserId}`);
+        const response = await fetch(`${SOCKET_URL}/api/messages/history/${user._id}/${otherUserId}`, {
+          credentials: "include"
+        });
         if (response.ok) {
           const data = await response.json();
           setMessages(data);

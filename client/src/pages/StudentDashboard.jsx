@@ -98,7 +98,9 @@ const StudentDashboard = ({ onLogout }) => {
     if (activeTab === "messages" && user) {
       const fetchConversations = async () => {
         try {
-          const response = await fetch(`https://career-counselling-nr04.onrender.com/api/messages/conversations/${user._id}`)
+          const response = await fetch(`https://career-counselling-nr04.onrender.com/api/messages/conversations/${user._id}`, {
+            credentials: "include"
+          })
           if (response.ok) {
             const data = await response.json()
             setConversations(data)
@@ -126,7 +128,10 @@ const StudentDashboard = ({ onLogout }) => {
     if (!window.confirm("Are you sure you want to cancel this appointment?")) return;
     setIsActionLoading(true);
     try {
-      const res = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/cancel/${id}`, { method: 'PUT' });
+      const res = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/cancel/${id}`, { 
+        method: 'PUT',
+        credentials: "include"
+      });
       if (res.ok) {
         setAppointments(prev => prev.map(app => app._id === id ? { ...app, status: 'Cancelled' } : app));
         alert("Appointment cancelled successfully");
@@ -147,6 +152,7 @@ const StudentDashboard = ({ onLogout }) => {
       const res = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/reschedule/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: "include",
         body: JSON.stringify({ date: rescheduleData.date, time: rescheduleData.time })
       });
       if (res.ok) {

@@ -52,7 +52,9 @@ const StudentDashboard = ({ onLogout }) => {
       try {
         console.log("🟢 Fetching profile for userId:", user._id)
 
-        const response = await fetch(`https://career-counselling-nr04.onrender.com/api/users/profile/${user._id}`)
+        const response = await fetch(`https://career-counselling-nr04.onrender.com/api/users/profile/${user._id}`, {
+          credentials: 'include'
+        })
         console.log("🔵 Fetch response status:", response.status)
 
         if (!response.ok) {
@@ -80,7 +82,9 @@ const StudentDashboard = ({ onLogout }) => {
 
     const fetchAppointments = async () => {
       try {
-        const response = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/student/${user._id}`)
+        const response = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/student/${user._id}`, {
+          credentials: 'include'
+        })
         if (response.ok) {
           const data = await response.json()
           setAppointments(data)
@@ -126,7 +130,10 @@ const StudentDashboard = ({ onLogout }) => {
     if (!window.confirm("Are you sure you want to cancel this appointment?")) return;
     setIsActionLoading(true);
     try {
-      const res = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/cancel/${id}`, { method: 'PUT' });
+      const res = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/cancel/${id}`, { 
+        method: 'PUT',
+        credentials: 'include'
+      });
       if (res.ok) {
         setAppointments(prev => prev.map(app => app._id === id ? { ...app, status: 'Cancelled' } : app));
         alert("Appointment cancelled successfully");
@@ -147,6 +154,7 @@ const StudentDashboard = ({ onLogout }) => {
       const res = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/reschedule/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ date: rescheduleData.date, time: rescheduleData.time })
       });
       if (res.ok) {

@@ -64,6 +64,8 @@ const BookAppointment = () => {
       // Construct a Date object for this slot on the selected date in LOCAL time
       const slotDate = new Date(`${selectedDate}T${hours.padStart(2, '0')}:${minutes || '00'}:00`)
       
+      const isPast = slotDate < new Date()
+      
       const isBooked = bookedAppointments.some(app => {
         if (app.status === 'Cancelled') return false
         const appDate = new Date(app.appointmentTime)
@@ -71,7 +73,7 @@ const BookAppointment = () => {
         return appDate.getTime() === slotDate.getTime()
       })
       
-      return !isBooked
+      return !isBooked && !isPast
     })
   }
 
@@ -154,12 +156,7 @@ const BookAppointment = () => {
       if (response.ok) {
         const responseData = await response.json();
         alert("Appointment booked successfully! You will receive a confirmation soon.")
-        if (sessionType === "video") {
-          const generatedRoomId = responseData.appointmentId || "room_" + Math.random().toString(36).substring(2, 9);
-          navigate(`/video-call/${generatedRoomId}`);
-        } else {
-          navigate("/consult-counsellor", { state: { user } })
-        }
+        navigate("/student-dashboard", { state: { user } })
       } else {
         throw new Error("Failed to book appointment")
       }

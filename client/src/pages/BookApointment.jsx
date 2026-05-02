@@ -38,8 +38,13 @@ const BookAppointment = () => {
       
       const dayName = date.toLocaleDateString('en-US', { weekday: 'long' })
       
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const localDate = `${year}-${month}-${day}`
+      
       if (availableDays.length === 0 || availableDays.includes(dayName)) {
-        dates.push(date.toISOString().split('T')[0])
+        dates.push(localDate)
       }
     }
     return dates
@@ -315,35 +320,11 @@ const BookAppointment = () => {
                 )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Session Type *
-                </label>
-                <div className="grid grid-cols-2 gap-4">
-                  <button
-                    onClick={() => setSessionType("video")}
-                    className={`p-4 rounded-lg border-2 transition-colors ${
-                      sessionType === "video"
-                        ? "border-purple-600 bg-purple-50 text-purple-700"
-                        : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
-                    }`}
-                  >
-                    <div className="text-2xl mb-2">🎥</div>
-                    <div className="font-medium">Video Call</div>
-                    <div className="text-sm text-gray-500">Face-to-face online session</div>
-                  </button>
-                  <button
-                    onClick={() => setSessionType("phone")}
-                    className={`p-4 rounded-lg border-2 transition-colors ${
-                      sessionType === "phone"
-                        ? "border-purple-600 bg-purple-50 text-purple-700"
-                        : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
-                    }`}
-                  >
-                    <div className="text-2xl mb-2">📞</div>
-                    <div className="font-medium">Phone Call</div>
-                    <div className="text-sm text-gray-500">Audio-only session</div>
-                  </button>
+              <div className="bg-purple-50 p-4 rounded-lg border border-purple-100 flex items-center space-x-4">
+                <div className="text-2xl">🎥</div>
+                <div>
+                  <div className="font-bold text-purple-900">Video Call Session</div>
+                  <div className="text-sm text-purple-700">All sessions are conducted via our secure video platform.</div>
                 </div>
               </div>
 

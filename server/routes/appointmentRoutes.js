@@ -20,7 +20,6 @@ router.post('/book', async (req, res) => {
             counselor: new mongoose.Types.ObjectId(counsellorId),
             appointmentTime,
             endTime,
-            timeSlot: time, 
             mode: sessionType === 'video' ? 'Online' : 'In-person',
             notes: message,
             status: 'Scheduled'
@@ -90,7 +89,7 @@ router.put('/reschedule/:id', async (req, res) => {
 
         const appointment = await Appointment.findByIdAndUpdate(
             req.params.id,
-            { appointmentTime, endTime, timeSlot: time, status: 'Scheduled' },
+            { appointmentTime, endTime, status: 'Scheduled' },
             { new: true }
         );
 

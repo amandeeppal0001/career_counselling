@@ -98,9 +98,7 @@ const StudentDashboard = ({ onLogout }) => {
     if (activeTab === "messages" && user) {
       const fetchConversations = async () => {
         try {
-          const response = await fetch(`https://career-counselling-nr04.onrender.com/api/messages/conversations/${user._id}`, {
-            credentials: "include"
-          })
+          const response = await fetch(`https://career-counselling-nr04.onrender.com/api/messages/conversations/${user._id}`)
           if (response.ok) {
             const data = await response.json()
             setConversations(data)
@@ -128,10 +126,7 @@ const StudentDashboard = ({ onLogout }) => {
     if (!window.confirm("Are you sure you want to cancel this appointment?")) return;
     setIsActionLoading(true);
     try {
-      const res = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/cancel/${id}`, { 
-        method: 'PUT',
-        credentials: "include"
-      });
+      const res = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/cancel/${id}`, { method: 'PUT' });
       if (res.ok) {
         setAppointments(prev => prev.map(app => app._id === id ? { ...app, status: 'Cancelled' } : app));
         alert("Appointment cancelled successfully");
@@ -152,7 +147,6 @@ const StudentDashboard = ({ onLogout }) => {
       const res = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/reschedule/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        credentials: "include",
         body: JSON.stringify({ date: rescheduleData.date, time: rescheduleData.time })
       });
       if (res.ok) {
@@ -389,7 +383,7 @@ const StudentDashboard = ({ onLogout }) => {
                         📅 {new Date(appointment.appointmentTime).toLocaleDateString()}
                       </span>
                       <span className="flex items-center text-purple-600 bg-white px-3 py-1 rounded-full font-medium border border-purple-100">
-                        ⏰ {appointment.timeSlot || new Date(appointment.appointmentTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        ⏰ {new Date(appointment.appointmentTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                       <span className={`flex items-center px-3 py-1 rounded-full font-medium bg-white border ${appointment.mode === 'Online' ? 'text-green-600 border-green-100' : 'text-orange-600 border-orange-100'}`}>
                         {appointment.mode === 'Online' ? '🎥 Video Call' : '🏢 In-person'}

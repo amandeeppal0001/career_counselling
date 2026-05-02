@@ -22,7 +22,6 @@ const server = http.createServer(app);
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
-  "https://career-counselling-vqqc.vercel.app",
   process.env.CLIENT_URL,
 ].filter(Boolean);
 

@@ -101,6 +101,19 @@ app.use('/api/interviews', interviewRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/messages', messageRoutes);
 
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error("Global Error Handler:", err);
+    const statusCode = err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+    res.status(statusCode).json({
+        success: false,
+        statusCode,
+        message,
+        errors: err.errors || []
+    });
+});
+
 if (!process.env.GEMINI_API_KEY) {
   throw new Error("GEMINI_API_KEY is not defined in the .env file.");
 }

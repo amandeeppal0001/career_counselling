@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose';
 
 const appointmentSchema = new mongoose.Schema({
@@ -16,6 +15,10 @@ const appointmentSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
+    timeSlot: {
+        type: String,
+        required: true
+    },
     status: {
         type: String,
         enum: ['Scheduled', 'Completed', 'Cancelled', 'No-show'],
@@ -25,14 +28,12 @@ const appointmentSchema = new mongoose.Schema({
         type: String
     },
     endTime: { type: Date, required: true },
-
     mode: { 
         type: String,
         enum: ['Online', 'In-person'],
         default: 'Online'
     }
 }, { timestamps: true });
-
 
 appointmentSchema.index({ counselor: 1, appointmentTime: 1 }, { unique: true });
 

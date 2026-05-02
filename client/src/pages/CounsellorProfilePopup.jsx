@@ -294,7 +294,19 @@ const CounsellorProfilePopup = ({ user, onComplete, onClose }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">Available Days *</label>
+              <div className="flex justify-between items-center mb-3">
+                <label className="text-sm font-semibold text-gray-700">Available Days *</label>
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    const allSelected = formData.availability.days.length === dayOptions.length;
+                    handleInputChange("availability.days", allSelected ? [] : [...dayOptions]);
+                  }}
+                  className="text-xs text-blue-600 hover:underline font-medium"
+                >
+                  {formData.availability.days.length === dayOptions.length ? "Deselect All" : "Select All"}
+                </button>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {dayOptions.map((opt) => (
                   <button
@@ -313,7 +325,19 @@ const CounsellorProfilePopup = ({ user, onComplete, onClose }) => {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">Available Time Slots *</label>
+              <div className="flex justify-between items-center mb-3">
+                <label className="text-sm font-semibold text-gray-700">Available Time Slots *</label>
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    const allSelected = formData.availability.timeSlots.length === timeSlotOptions.length;
+                    handleInputChange("availability.timeSlots", allSelected ? [] : [...timeSlotOptions]);
+                  }}
+                  className="text-xs text-blue-600 hover:underline font-medium"
+                >
+                  {formData.availability.timeSlots.length === timeSlotOptions.length ? "Deselect All" : "Select All"}
+                </button>
+              </div>
               <div className="grid grid-cols-3 gap-2">
                 {timeSlotOptions.map((opt) => (
                   <button

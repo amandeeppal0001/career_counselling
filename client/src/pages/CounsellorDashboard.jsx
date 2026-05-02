@@ -463,7 +463,7 @@ const CounsellorDashboard = ({ onLogout }) => {
                         📅 {new Date(appointment.appointmentTime).toLocaleDateString()}
                       </span>
                       <span className="flex items-center text-purple-600 bg-white px-3 py-1 rounded-full font-medium border border-purple-100">
-                        ⏰ {new Date(appointment.appointmentTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        ⏰ {appointment.timeSlot || new Date(appointment.appointmentTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                       <span className={`flex items-center px-3 py-1 rounded-full font-medium bg-white border ${appointment.mode === 'Online' ? 'text-green-600 border-green-100' : 'text-orange-600 border-orange-100'}`}>
                         {appointment.mode === 'Online' ? '🎥 Video Call' : '🏢 In-person'}
@@ -533,7 +533,7 @@ const CounsellorDashboard = ({ onLogout }) => {
                             <h4 className="font-bold text-gray-700">{appointment.student?.name || 'Student'}</h4>
                             <div className="flex gap-4 text-sm mt-2">
                               <span className="text-gray-600">📅 {new Date(appointment.appointmentTime).toLocaleDateString()}</span>
-                              <span className="text-gray-600">⏰ {new Date(appointment.appointmentTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                              <span className="text-gray-600">⏰ {appointment.timeSlot || new Date(appointment.appointmentTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                               <span className={`font-semibold ${appointment.status === 'Cancelled' ? 'text-red-500' : 'text-gray-600'}`}>
                                 Status: {appointment.status}
                               </span>

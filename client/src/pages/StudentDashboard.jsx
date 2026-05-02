@@ -389,7 +389,7 @@ const StudentDashboard = ({ onLogout }) => {
                         📅 {new Date(appointment.appointmentTime).toLocaleDateString()}
                       </span>
                       <span className="flex items-center text-purple-600 bg-white px-3 py-1 rounded-full font-medium border border-purple-100">
-                        ⏰ {new Date(appointment.appointmentTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        ⏰ {appointment.timeSlot || new Date(appointment.appointmentTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                       <span className={`flex items-center px-3 py-1 rounded-full font-medium bg-white border ${appointment.mode === 'Online' ? 'text-green-600 border-green-100' : 'text-orange-600 border-orange-100'}`}>
                         {appointment.mode === 'Online' ? '🎥 Video Call' : '🏢 In-person'}

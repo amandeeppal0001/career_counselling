@@ -14,6 +14,7 @@ const ProfileCompletionPopup = ({ user, onComplete, onClose }) => {
     careerGoals: '',
     hobbies: []
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const steps = [
     { title: 'Academic Information', subtitle: 'Tell us about your current studies' },
@@ -54,12 +55,13 @@ const ProfileCompletionPopup = ({ user, onComplete, onClose }) => {
   };
 
   const handleSubmit = async () => {
+    setIsSubmitting(true);
     try {
      console.log("User in profile popup:", user);
      console.log("formdata", formData);
 
 const response = await axios.patch(
-    'https://careercounselling-production-725b.up.railway.app/api/users/completeProfile',
+    'https://career-counselling-nr04.onrender.com/api/users/completeProfile',
     {
         ...formData,
         profileCompleted: true,
@@ -80,10 +82,12 @@ const response = await axios.patch(
       } else {
         console.log(formData);
         alert('Failed to save profile. Please try again.');
+        setIsSubmitting(false);
       }
     } catch (error) {
       console.error('Error saving profile:', error);
       alert('Error saving profile. Please try again.');
+      setIsSubmitting(false);
     }
   };
 
@@ -343,9 +347,10 @@ const response = await axios.patch(
           {currentStep === steps.length - 1 ? (
             <button
               onClick={handleSubmit}
-              className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all font-medium"
+              disabled={isSubmitting}
+              className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Complete Profile
+              {isSubmitting ? "Saving Profile..." : "Complete Profile"}
             </button>
           ) : (
             <button

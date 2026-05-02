@@ -9,6 +9,10 @@ function Summary() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!localStorage.getItem("user")) {
+      navigate("/", { replace: true });
+      return;
+    }
 
     const data = location.state?.summary;
     if (data) {

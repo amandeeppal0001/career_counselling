@@ -9,6 +9,12 @@ const BookAppointment = () => {
   const navigate = useNavigate()
   const user = location.state?.user
 
+  useEffect(() => {
+    if (!localStorage.getItem("user")) {
+      navigate("/", { replace: true })
+    }
+  }, [navigate])
+
   const [counsellor, setCounsellor] = useState(null)
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState("")
@@ -40,7 +46,7 @@ const BookAppointment = () => {
   useEffect(() => {
     const fetchCounsellorDetails = async () => {
       try {
-        const response = await fetch(`https://careercounselling-production-725b.up.railway.app/api/counsellors/${counsellorId}`)
+        const response = await fetch(`https://career-counselling-nr04.onrender.com/api/counsellors/${counsellorId}`)
         if (response.ok) {
           const data = await response.json()
           setCounsellor(data)
@@ -76,7 +82,7 @@ const BookAppointment = () => {
         status: "pending"
       }
 
-      const response = await fetch("https://careercounselling-production-725b.up.railway.app/api/appointments/book", {
+      const response = await fetch("https://career-counselling-nr04.onrender.com/api/appointments/book", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

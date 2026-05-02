@@ -53,7 +53,7 @@ function ChatPanel() {
 
     try {
       const resultResponse= await fetch(
-        "https://careercounselling-production-725b.up.railway.app/api/interviews/evaluate",
+        "https://career-counselling-nr04.onrender.com/api/interviews/evaluate",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -93,7 +93,7 @@ function ChatPanel() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        "https://careercounselling-production-725b.up.railway.app/api/interviews/summary",
+        "https://career-counselling-nr04.onrender.com/api/interviews/summary",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

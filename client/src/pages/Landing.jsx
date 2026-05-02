@@ -2,7 +2,7 @@
 
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import axios from "axios"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -22,6 +22,17 @@ export default function LandingPage() {
     const navigate = useNavigate()
     const [user, setUser] = useState(null)
     const [showProfilePopup, setShowProfilePopup] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            if (parsedUser.role === "student") navigate("/student-dashboard");
+            else if (parsedUser.role === "parent") navigate("/parent-dashboard");
+            else if (parsedUser.role === "counselor") navigate("/counselor-dashboard");
+        }
+    }, [navigate]);
 
     const handleSignIn = async () => {
         if (!email || !password) {
@@ -29,14 +40,15 @@ export default function LandingPage() {
             return;
         }
 
-        try {
-                   const res = await axios.post("https://careercounselling-production-725b.up.railway.app/api/users/login", {
-            email,
-            password,
-        }, {
+        setIsLoading(true);
 
-            withCredentials: true,
-        });
+        try {
+            const res = await axios.post("https://career-counselling-nr04.onrender.com/api/users/login", {
+                email,
+                password,
+            }, {
+                withCredentials: true,
+            });
 
             console.log("✅ Sign-in successful:", res.data);
 
@@ -54,6 +66,7 @@ export default function LandingPage() {
         } catch (err) {
             console.error("❌ Sign-in error:", err.response?.data || err.message);
             alert("Invalid email or password. Please try again.");
+            setIsLoading(false);
         }
     };
 
@@ -63,19 +76,20 @@ export default function LandingPage() {
             return;
         }
 
-        try {
-         const res = await axios.post("https://careercounselling-production-725b.up.railway.app/api/users/signup", {
-            name,
-            email,
-            password,
-            role
-        }, {
+        setIsLoading(true);
 
-            headers: {
-                "Content-Type": "application/json"
-            },
-            withCredentials: true 
-        });
+        try {
+            const res = await axios.post("https://career-counselling-nr04.onrender.com/api/users/signup", {
+                name,
+                email,
+                password,
+                role
+            }, {
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                withCredentials: true 
+            });
 
             console.log("✅ User created:", res.data);
             alert("User data saved successfully!");
@@ -88,7 +102,6 @@ export default function LandingPage() {
             if (newUser.role === "student") {
                 setShowProfilePopup(true);
             } else {
-
                 if (newUser.role === "parent") navigate("/parent-dashboard", { state: { user: newUser } });
                 if (newUser.role === "counselor") navigate("/counselor-dashboard", { state: { user: newUser } });
             }
@@ -100,6 +113,7 @@ export default function LandingPage() {
         } catch (err) {
             console.error("❌ Signup error:", err.response?.data || err.message);
             alert(err.response?.data?.error || "Error saving user data");
+            setIsLoading(false);
         }
     };
 
@@ -244,11 +258,22 @@ export default function LandingPage() {
                             <Button
                                 className="w-full"
                                 onClick={() => isSignUp ? handleRoleSelection(selectedRole) : handleSignIn()}
-                                disabled={isSignUp && !selectedRole}
+                                disabled={isLoading || (isSignUp && !selectedRole)}
                             >
-                                {isSignUp ? "Create Account" : "Sign In"}
+                                {isLoading ? "Processing..." : (isSignUp ? "Create Account" : "Sign In")}
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
+
+                            {isLoading && (
+                                <div className="p-3 rounded-lg bg-primary/10 border border-primary/20 text-sm text-primary animate-pulse flex flex-col items-center gap-2">
+                                    <TrendingUp className="h-4 w-4 animate-bounce" />
+                                    <p className="text-center font-medium">
+                                        Render's free tier is starting the server...
+                                        <br />
+                                        Please wait for about 60 seconds.
+                                    </p>
+                                </div>
+                            )}
 
                             <div className="text-center text-sm text-muted-foreground">
                                 {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}

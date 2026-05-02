@@ -10,6 +10,12 @@ const VideoCall = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
 
+  useEffect(() => {
+    if (!localStorage.getItem("user")) {
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
+
   const myVideo = useRef();
   const remoteVideo = useRef();
   const connectionRef = useRef(null);
@@ -19,7 +25,7 @@ const VideoCall = () => {
 
   useEffect(() => {
     let isMounted = true;
-    const socket = io('https://careercounselling-production-725b.up.railway.app');
+    const socket = io('https://career-counselling-nr04.onrender.com');
     socketRef.current = socket;
     const myId = myIdRef.current;
 

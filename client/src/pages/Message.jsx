@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 
-const SOCKET_URL = 'https://careercounselling-production-725b.up.railway.app';
+const SOCKET_URL = 'https://career-counselling-nr04.onrender.com';
 
 function Message({ user: propUser }) {
   const { id: otherUserId } = useParams();

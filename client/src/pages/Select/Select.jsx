@@ -15,11 +15,17 @@ function Select() {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (!localStorage.getItem("user")) {
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch("https://careercounselling-production-725b.up.railway.app/api/interviews/start", {
+      const response = await fetch("https://career-counselling-nr04.onrender.com/api/interviews/start", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -8,6 +8,12 @@ const ConsultCounsellor = () => {
   const navigate = useNavigate()
   const user = location.state?.user
 
+  useEffect(() => {
+    if (!localStorage.getItem("user")) {
+      navigate("/", { replace: true })
+    }
+  }, [navigate])
+
   const [counsellors, setCounsellors] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -19,7 +25,7 @@ const ConsultCounsellor = () => {
     const fetchCounsellors = async () => {
       try {
         setLoading(true)
-       const response = await fetch("https://careercounselling-production-725b.up.railway.app/api/users/counsellors/all");
+       const response = await fetch("https://career-counselling-nr04.onrender.com/api/users/counsellors/all");
 
         if (!response.ok) {
           throw new Error("Failed to fetch counsellors")
@@ -111,7 +117,7 @@ const ConsultCounsellor = () => {
               <h1 className="text-2xl font-bold text-gray-900">Consult Counsellors</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-gray-700">Welcome, {user?.email}</span>
+              <span className="text-gray-700">Welcome, {user?.name || user?.email}</span>
               <button
                 onClick={() => {
                   localStorage.removeItem("user")

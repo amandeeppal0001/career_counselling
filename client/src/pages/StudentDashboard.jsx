@@ -22,6 +22,7 @@ const StudentDashboard = ({ onLogout }) => {
   const [rescheduleData, setRescheduleData] = useState(null)
   const [activeTab, setActiveTab] = useState("dashboard")
   const [conversations, setConversations] = useState([])
+  const [isActionLoading, setIsActionLoading] = useState(false)
 
   console.log("🔵 StudentDashboard rendered. User state:", user)
 
@@ -51,7 +52,7 @@ const StudentDashboard = ({ onLogout }) => {
       try {
         console.log("🟢 Fetching profile for userId:", user._id)
 
-        const response = await fetch(`https://careercounselling-production-725b.up.railway.app/api/users/profile/${user._id}`)
+        const response = await fetch(`https://career-counselling-nr04.onrender.com/api/users/profile/${user._id}`)
         console.log("🔵 Fetch response status:", response.status)
 
         if (!response.ok) {
@@ -79,7 +80,7 @@ const StudentDashboard = ({ onLogout }) => {
 
     const fetchAppointments = async () => {
       try {
-        const response = await fetch(`https://careercounselling-production-725b.up.railway.app/api/appointments/student/${user._id}`)
+        const response = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/student/${user._id}`)
         if (response.ok) {
           const data = await response.json()
           setAppointments(data)
@@ -97,7 +98,7 @@ const StudentDashboard = ({ onLogout }) => {
     if (activeTab === "messages" && user) {
       const fetchConversations = async () => {
         try {
-          const response = await fetch(`https://careercounselling-production-725b.up.railway.app/api/messages/conversations/${user._id}`)
+          const response = await fetch(`https://career-counselling-nr04.onrender.com/api/messages/conversations/${user._id}`)
           if (response.ok) {
             const data = await response.json()
             setConversations(data)
@@ -123,8 +124,9 @@ const StudentDashboard = ({ onLogout }) => {
 
   const handleCancelAppointment = async (id) => {
     if (!window.confirm("Are you sure you want to cancel this appointment?")) return;
+    setIsActionLoading(true);
     try {
-      const res = await fetch(`https://careercounselling-production-725b.up.railway.app/api/appointments/cancel/${id}`, { method: 'PUT' });
+      const res = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/cancel/${id}`, { method: 'PUT' });
       if (res.ok) {
         setAppointments(prev => prev.map(app => app._id === id ? { ...app, status: 'Cancelled' } : app));
         alert("Appointment cancelled successfully");
@@ -133,13 +135,16 @@ const StudentDashboard = ({ onLogout }) => {
       }
     } catch (e) {
       console.error(e);
+    } finally {
+      setIsActionLoading(false);
     }
   }
 
   const handleRescheduleSubmit = async (e, id) => {
     e.preventDefault();
+    setIsActionLoading(true);
     try {
-      const res = await fetch(`https://careercounselling-production-725b.up.railway.app/api/appointments/reschedule/${id}`, {
+      const res = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/reschedule/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date: rescheduleData.date, time: rescheduleData.time })
@@ -152,6 +157,8 @@ const StudentDashboard = ({ onLogout }) => {
       }
     } catch (e) {
       console.error(e);
+    } finally {
+      setIsActionLoading(false);
     }
   }
 
@@ -252,7 +259,7 @@ const StudentDashboard = ({ onLogout }) => {
               >
                 Messages
               </button>
-              <span className="text-gray-700">Welcome, {user?.email}</span>
+              <span className="text-gray-700">Welcome, {user?.name || user?.email}</span>
               <button
                 onClick={() => {
                   localStorage.removeItem("user")
@@ -390,8 +397,10 @@ const StudentDashboard = ({ onLogout }) => {
                         <input type="date" required value={rescheduleData.date} onChange={e => setRescheduleData({...rescheduleData, date: e.target.value})} className="border rounded px-2 py-1 text-sm" />
                         <input type="time" required value={rescheduleData.time} onChange={e => setRescheduleData({...rescheduleData, time: e.target.value})} className="border rounded px-2 py-1 text-sm" />
                         <div className="flex gap-2">
-                          <button type="submit" className="bg-blue-600 text-white px-3 py-1 rounded text-sm w-full font-medium">Save</button>
-                          <button type="button" onClick={() => setRescheduleData(null)} className="bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm w-full font-medium">Cancel</button>
+                          <button disabled={isActionLoading} type="submit" className="bg-blue-600 text-white px-3 py-1 rounded text-sm w-full font-medium">
+                            {isActionLoading ? "Saving..." : "Save"}
+                          </button>
+                          <button disabled={isActionLoading} type="button" onClick={() => setRescheduleData(null)} className="bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm w-full font-medium">Cancel</button>
                         </div>
                       </form>
                     ) : (
@@ -408,16 +417,18 @@ const StudentDashboard = ({ onLogout }) => {
                         )}
                         <div className="flex gap-2">
                           <button 
+                            disabled={isActionLoading}
                             onClick={() => setRescheduleData({ id: appointment._id, date: '', time: '' })}
-                            className="flex-1 bg-white border border-blue-600 text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-50 font-medium transition-colors"
+                            className="flex-1 bg-white border border-blue-600 text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-50 font-medium transition-colors disabled:opacity-50"
                           >
                             Reschedule
                           </button>
                           <button 
+                            disabled={isActionLoading}
                             onClick={() => handleCancelAppointment(appointment._id)}
-                            className="flex-1 bg-white border border-red-500 text-red-500 px-3 py-2 rounded-lg hover:bg-red-50 font-medium transition-colors"
+                            className="flex-1 bg-white border border-red-500 text-red-500 px-3 py-2 rounded-lg hover:bg-red-50 font-medium transition-colors disabled:opacity-50"
                           >
-                            Cancel
+                            {isActionLoading ? "..." : "Cancel"}
                           </button>
                         </div>
                       </>

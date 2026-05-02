@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import CollegeMap from "./CollegeMap.jsx"
 import LoadingSkeleton from "./LoadingSkeleton"
@@ -8,6 +8,12 @@ import { searchColleges } from "../services/collegeApi"
 
 const ExploreColleges = () => {
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!localStorage.getItem("user")) {
+      navigate("/", { replace: true })
+    }
+  }, [navigate])
   const [searchFilters, setSearchFilters] = useState({
     location: "",
     collegeType: "",

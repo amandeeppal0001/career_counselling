@@ -22,39 +22,88 @@ const BookAppointment = () => {
   const [sessionType, setSessionType] = useState("video")
   const [message, setMessage] = useState("")
   const [isBooking, setIsBooking] = useState(false)
-
-
-  const timeSlots = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`);
-
+  const [bookedAppointments, setBookedAppointments] = useState([])
+  const [fetchingAppointments, setFetchingAppointments] = useState(false)
 
   const getAvailableDates = () => {
     const dates = []
     const today = new Date()
+    today.setHours(0, 0, 0, 0)
 
-    for (let i = 0; i <= 10; i++) {
+    const availableDays = counsellor?.availability?.days || []
+    
+    for (let i = 0; i <= 30; i++) {
       const date = new Date(today)
       date.setDate(today.getDate() + i)
-
-
-      if (date.getDay() !== 0 && date.getDay() !== 6) {
+      
+      const dayName = date.toLocaleDateString('en-US', { weekday: 'long' })
+      
+      if (availableDays.length === 0 || availableDays.includes(dayName)) {
         dates.push(date.toISOString().split('T')[0])
       }
     }
     return dates
   }
 
+  const getAvailableTimeSlots = () => {
+    const defaultSlots = counsellor?.availability?.timeSlots || []
+    
+    if (defaultSlots.length === 0) return []
+
+    return defaultSlots.filter(slot => {
+      if (!selectedDate) return true
+      
+      const slotTime = slot.split('-')[0]
+      const [hours, minutes] = slotTime.split(':')
+      
+      // Construct a Date object for this slot on the selected date in LOCAL time
+      const slotDate = new Date(`${selectedDate}T${hours.padStart(2, '0')}:${minutes || '00'}:00`)
+      
+      const isBooked = bookedAppointments.some(app => {
+        if (app.status === 'Cancelled') return false
+        const appDate = new Date(app.appointmentTime)
+        // Compare UTC times (both Date objects will be converted to UTC internally)
+        return appDate.getTime() === slotDate.getTime()
+      })
+      
+      return !isBooked
+    })
+  }
+
   useEffect(() => {
     const fetchCounsellorDetails = async () => {
       try {
-        const response = await fetch(`https://career-counselling-nr04.onrender.com/api/counsellors/${counsellorId}`)
+        const response = await fetch(`https://career-counselling-nr04.onrender.com/api/counsellors/${counsellorId}`, {
+          credentials: 'include'
+        })
         if (response.ok) {
           const data = await response.json()
           setCounsellor(data)
+          if (data.userId) {
+            fetchBookedAppointments(data.userId)
+          }
         }
       } catch (error) {
         console.error("Error fetching counsellor:", error)
       } finally {
         setLoading(false)
+      }
+    }
+
+    const fetchBookedAppointments = async (userId) => {
+      setFetchingAppointments(true)
+      try {
+        const response = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/counselor/${userId}`, {
+          credentials: 'include'
+        })
+        if (response.ok) {
+          const data = await response.json()
+          setBookedAppointments(data)
+        }
+      } catch (error) {
+        console.error("Error fetching booked appointments:", error)
+      } finally {
+        setFetchingAppointments(false)
       }
     }
 
@@ -72,11 +121,17 @@ const BookAppointment = () => {
     setIsBooking(true)
 
     try {
+      const timeStr = selectedTime.split('-')[0]
+      const [hours, minutes] = timeStr.split(':')
+      // Create a Date object in the user's local timezone
+      const appointmentDate = new Date(`${selectedDate}T${hours.padStart(2, '0')}:${minutes || '00'}:00`)
+
       const appointmentData = {
         studentId: user._id,
         counsellorId: counsellor.userId, 
         date: selectedDate,
         time: selectedTime,
+        appointmentTimeISO: appointmentDate.toISOString(), // Send UTC ISO string
         sessionType: sessionType,
         message: message,
         status: "pending"
@@ -137,9 +192,10 @@ const BookAppointment = () => {
     )
   }
 
+  const availableTimeSlots = getAvailableTimeSlots()
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -161,7 +217,6 @@ const BookAppointment = () => {
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {}
           {counsellor && (
             <div className="bg-white rounded-2xl shadow-lg p-6">
               <div className="text-center mb-6">
@@ -197,19 +252,20 @@ const BookAppointment = () => {
             </div>
           )}
 
-          {}
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-6">Schedule Your Session</h3>
 
             <div className="space-y-6">
-              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Select Date *
                 </label>
                 <select
                   value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedDate(e.target.value)
+                    setSelectedTime("")
+                  }}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   required
                 >
@@ -229,29 +285,36 @@ const BookAppointment = () => {
                 </select>
               </div>
 
-              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Time *
+                  Select Time * {fetchingAppointments && <span className="text-xs text-blue-500 animate-pulse ml-2">(Checking slots...)</span>}
                 </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {timeSlots.map(time => (
-                    <button
-                      key={time}
-                      onClick={() => setSelectedTime(time)}
-                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                        selectedTime === time
-                          ? "bg-purple-600 text-white"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      }`}
-                    >
-                      {time}
-                    </button>
-                  ))}
-                </div>
+                {selectedDate ? (
+                  availableTimeSlots.length > 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      {availableTimeSlots.map(time => (
+                        <button
+                          key={time}
+                          type="button"
+                          onClick={() => setSelectedTime(time)}
+                          className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                            selectedTime === time
+                              ? "bg-purple-600 text-white"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          }`}
+                        >
+                          {time}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-red-500 italic">No slots available for this date.</p>
+                  )
+                ) : (
+                  <p className="text-sm text-gray-500 italic">Please select a date first.</p>
+                )}
               </div>
 
-              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Session Type *
@@ -284,7 +347,6 @@ const BookAppointment = () => {
                 </div>
               </div>
 
-              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Additional Message (Optional)
@@ -298,7 +360,6 @@ const BookAppointment = () => {
                 />
               </div>
 
-              {}
               <button
                 onClick={handleBooking}
                 disabled={isBooking || !selectedDate || !selectedTime}

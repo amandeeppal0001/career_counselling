@@ -8,10 +8,15 @@ router.post('/book', async (req, res) => {
     try {
         const { studentId, counsellorId, date, time, sessionType, message } = req.body;
 
-        const timeStr = time.includes('-') ? time.split('-')[0] : time;
-        const [startHour, startMinute] = timeStr.split(':');
+        let appointmentTime;
+        if (req.body.appointmentTimeISO) {
+            appointmentTime = new Date(req.body.appointmentTimeISO);
+        } else {
+            const timeStr = time.includes('-') ? time.split('-')[0] : time;
+            const [startHour, startMinute] = timeStr.split(':');
+            appointmentTime = new Date(`${date}T${startHour.padStart(2, '0')}:${startMinute || '00'}:00`);
+        }
 
-        const appointmentTime = new Date(`${date}T${startHour.padStart(2, '0')}:${startMinute || '00'}:00`);
         const endTime = new Date(appointmentTime);
         endTime.setHours(appointmentTime.getHours() + 1);
 
@@ -80,10 +85,15 @@ router.put('/reschedule/:id', async (req, res) => {
     try {
         const { date, time } = req.body;
 
-        const timeStr = time.includes('-') ? time.split('-')[0] : time;
-        const [startHour, startMinute] = timeStr.split(':');
-
-        const appointmentTime = new Date(`${date}T${startHour.padStart(2, '0')}:${startMinute || '00'}:00`);
+        let appointmentTime;
+        if (req.body.appointmentTimeISO) {
+            appointmentTime = new Date(req.body.appointmentTimeISO);
+        } else {
+            const timeStr = time.includes('-') ? time.split('-')[0] : time;
+            const [startHour, startMinute] = timeStr.split(':');
+            appointmentTime = new Date(`${date}T${startHour.padStart(2, '0')}:${startMinute || '00'}:00`);
+        }
+        
         const endTime = new Date(appointmentTime);
         endTime.setHours(appointmentTime.getHours() + 1);
 

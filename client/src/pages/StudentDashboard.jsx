@@ -150,12 +150,17 @@ const StudentDashboard = ({ onLogout }) => {
   const handleRescheduleSubmit = async (e, id) => {
     e.preventDefault();
     setIsActionLoading(true);
+    const appointmentDate = new Date(`${rescheduleData.date}T${rescheduleData.time}:00`)
     try {
       const res = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/reschedule/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ date: rescheduleData.date, time: rescheduleData.time })
+        body: JSON.stringify({ 
+          date: rescheduleData.date, 
+          time: rescheduleData.time,
+          appointmentTimeISO: appointmentDate.toISOString()
+        })
       });
       if (res.ok) {
         alert("Appointment rescheduled successfully!");

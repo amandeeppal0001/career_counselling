@@ -82,4 +82,18 @@ router.get("/counsellors/all", async (req, res) => {
   }
 });
 
+router.get("/counsellors/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const profile = await counsellorProfile.findById(id);
+    if (!profile) {
+      return res.status(404).json({ message: "Counsellor not found" });
+    }
+    res.json(profile);
+  } catch (error) {
+    console.error("Error fetching counsellor by ID:", error);
+    res.status(500).json({ error: "Failed to fetch counsellor" });
+  }
+});
+
 export default router;

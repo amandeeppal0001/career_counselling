@@ -22,19 +22,26 @@ const BookAppointment = () => {
   const [sessionType, setSessionType] = useState("video")
   const [message, setMessage] = useState("")
   const [isBooking, setIsBooking] = useState(false)
+  const [error, setError] = useState(null)
 
 
   const timeSlots = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`);
 
 
   const getAvailableDates = () => {
+    if (!counsellor?.availability?.days) return []
     const dates = []
     const today = new Date()
+    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
-    for (let i = 0; i <= 10; i++) {
+    for (let i = 0; i <= 30; i++) { 
       const date = new Date(today)
       date.setDate(today.getDate() + i)
-      dates.push(date.toISOString().split("T")[0])
+      const dayName = dayNames[date.getDay()]
+      
+      if (counsellor.availability.days.includes(dayName)) {
+        dates.push(date.toISOString().split("T")[0])
+      }
     }
     return dates
   }
@@ -48,9 +55,12 @@ const BookAppointment = () => {
         if (response.ok) {
           const data = await response.json()
           setCounsellor(data)
+        } else {
+          setError("Counsellor not found")
         }
       } catch (error) {
         console.error("Error fetching counsellor:", error)
+        setError("Failed to load counsellor information")
       } finally {
         setLoading(false)
       }
@@ -72,7 +82,7 @@ const BookAppointment = () => {
     try {
       const appointmentData = {
         studentId: user._id,
-        counsellorId: counsellor.userId, 
+        counsellorId: counsellor?.userId || counsellor?._id, 
         date: selectedDate,
         time: selectedTime,
         sessionType: sessionType,
@@ -130,6 +140,24 @@ const BookAppointment = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
+
+  if (error || !counsellor) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center p-8 bg-white rounded-2xl shadow-lg">
+          <div className="text-red-500 text-5xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Counsellor Not Found</h2>
+          <p className="text-gray-600 mb-6">{error || "The requested counsellor profile could not be found."}</p>
+          <button
+            onClick={() => navigate("/consult-counsellor")}
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Back to Counsellors
+          </button>
+        </div>
       </div>
     )
   }
@@ -223,7 +251,7 @@ const BookAppointment = () => {
                     Select Time
                   </h3>
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                    {timeSlots.map((time) => (
+                    {(counsellor?.availability?.timeSlots || []).map((time) => (
                       <button
                         key={time}
                         onClick={() => setSelectedTime(time)}
@@ -256,17 +284,6 @@ const BookAppointment = () => {
                     >
                       <span className="text-xl">📹</span>
                       <span className="font-bold">Video Call</span>
-                    </button>
-                    <button
-                      onClick={() => setSessionType("chat")}
-                      className={`flex-1 p-4 rounded-xl border-2 transition-all flex items-center justify-center gap-2 ${
-                        sessionType === "chat"
-                          ? "bg-blue-50 border-blue-600 text-blue-700"
-                          : "border-gray-100 hover:border-blue-300"
-                      }`}
-                    >
-                      <span className="text-xl">💬</span>
-                      <span className="font-bold">Chat</span>
                     </button>
                   </div>
                 </div>

@@ -83,10 +83,26 @@ export default function ParentDashboard() {
               <Button variant="ghost" size="icon">
                 <Settings className="h-5 w-5" />
               </Button>
-              <Button variant="outline" size="sm">
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
+             <Button 
+  variant="outline" 
+  size="sm"
+  onClick={async () => {
+    try {
+      await fetch("https://career-counselling-nr04.onrender.com/api/users/logout", {
+        method: "POST",
+        credentials: "include"
+      });
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      localStorage.removeItem("user");
+      navigate("/");
+    }
+  }}
+>
+  <LogOut className="h-4 w-4 mr-2" />
+  Logout
+</Button>
             </div>
           </div>
         </div>

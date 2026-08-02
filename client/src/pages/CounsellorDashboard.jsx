@@ -582,19 +582,26 @@ const CounsellorDashboard = ({ onLogout }) => {
                     {unreadCount}
                   </span>
                 )}
-              </button>
-              <span className="text-gray-700">Welcome, {user?.name || user?.email}</span>
-              <button
-                onClick={() => {
-                  localStorage.removeItem("user")
-                  setUser(null)
-                  navigate("/")
-                  if (onLogout) onLogout()
-                }}
-                className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-100"
-              >
-                Logout
-              </button>
+            <button
+  onClick={async () => {
+    try {
+      await fetch("https://career-counselling-nr04.onrender.com/api/users/logout", {
+        method: "POST", 
+        credentials: "include"
+      });
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      localStorage.removeItem("user")
+      setUser(null)
+      navigate("/")
+      if (onLogout) onLogout()
+    }
+  }}
+  className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-100"
+>
+  Logout
+</button>
             </div>
           </div>
         </div>

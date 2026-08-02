@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 import User from "../models/user.js";
 import UserProfile from "../models/UserProfile.js"; 
-import { createOrUpdateProfile, getProfile, loginUser, registerCounselor, registerUser } from "../controller/authController.js";
+import { createOrUpdateProfile, getProfile, loginUser, registerCounselor, registerUser, logoutUser } from "../controller/authController.js";
 import verifyJWT from "../middleware/authMiddleware.js";
 import counsellorProfile from "../models/counsellor-profile.js";
 
@@ -11,7 +11,8 @@ const router = express.Router();
 
 router.post("/signup",registerUser);
 
-router.post('/login',loginUser)
+router.post('/login',loginUser);
+router.post('/logout', verifyJWT, logoutUser);
 
 router.route('/completeProfile').patch(verifyJWT, createOrUpdateProfile).get(verifyJWT, getProfile);
 

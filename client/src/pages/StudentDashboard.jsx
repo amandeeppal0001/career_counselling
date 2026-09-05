@@ -6,6 +6,8 @@ import { useState, useEffect } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import ProfileCompletionPopup from "./ProfileCompletionPopup"
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://career-counselling-nr04.onrender.com"
+
 const StudentDashboard = ({ onLogout }) => {
   const location = useLocation()
   const navigate = useNavigate()
@@ -52,7 +54,7 @@ const StudentDashboard = ({ onLogout }) => {
       try {
         console.log("🟢 Fetching profile for userId:", user._id)
 
-        const response = await fetch(`https://career-counselling-nr04.onrender.com/api/users/profile/${user._id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/users/profile/${user._id}`, {
           credentials: 'include'
         })
         console.log("🔵 Fetch response status:", response.status)
@@ -82,7 +84,7 @@ const StudentDashboard = ({ onLogout }) => {
 
     const fetchAppointments = async () => {
       try {
-        const response = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/student/${user._id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/appointments/student/${user._id}`, {
           credentials: 'include'
         })
         if (response.ok) {
@@ -102,7 +104,7 @@ const StudentDashboard = ({ onLogout }) => {
     if (activeTab === "messages" && user) {
       const fetchConversations = async () => {
         try {
-          const response = await fetch(`https://career-counselling-nr04.onrender.com/api/messages/conversations/${user._id}`)
+          const response = await fetch(`${API_BASE_URL}/api/messages/conversations/${user._id}`)
           if (response.ok) {
             const data = await response.json()
             setConversations(data)
@@ -130,7 +132,7 @@ const StudentDashboard = ({ onLogout }) => {
     if (!window.confirm("Are you sure you want to cancel this appointment?")) return;
     setIsActionLoading(true);
     try {
-      const res = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/cancel/${id}`, { 
+      const res = await fetch(`${API_BASE_URL}/api/appointments/cancel/${id}`, { 
         method: 'PUT',
         credentials: 'include'
       });
@@ -152,7 +154,7 @@ const StudentDashboard = ({ onLogout }) => {
     setIsActionLoading(true);
     const appointmentDate = new Date(`${rescheduleData.date}T${rescheduleData.time}:00`)
     try {
-      const res = await fetch(`https://career-counselling-nr04.onrender.com/api/appointments/reschedule/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/appointments/reschedule/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -274,8 +276,7 @@ const StudentDashboard = ({ onLogout }) => {
               </button>
               <span className="text-gray-700">Welcome, {user?.name || user?.email}</span>
               <button
-              onClick={async () => {
-  try {
+
   
                 onClick={async () => {
                   try {
@@ -346,7 +347,7 @@ const StudentDashboard = ({ onLogout }) => {
           </p>
         </div>
 
-        {/* Feature Cards */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
             <div
@@ -412,6 +413,9 @@ const StudentDashboard = ({ onLogout }) => {
                       </span>
                       <span className={`flex items-center px-3 py-1 rounded-full font-medium bg-white border ${appointment.mode === 'Online' ? 'text-green-600 border-green-100' : 'text-orange-600 border-orange-100'}`}>
                         {appointment.mode === 'Online' ? '🎥 Video Call' : '🏢 In-person'}
+                      </span>
+                      <span className="flex items-center px-3 py-1 rounded-full font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        💳 {appointment.paymentStatus === 'Free' ? 'Free Session' : `Paid ₹${appointment.amountPaid || 500}`}
                       </span>
                     </div>
                   </div>
@@ -491,7 +495,7 @@ const StudentDashboard = ({ onLogout }) => {
           </div>
         )}
 
-        {/* Profile Summary */}
+
         {profileCompleted && userProfile && (
           <div className="mt-16 bg-white rounded-2xl shadow-lg p-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">Your Profile Summary</h3>
@@ -574,7 +578,7 @@ const StudentDashboard = ({ onLogout }) => {
         </div>
       )}
 
-      {/* Profile Completion Popup */}
+     
       {showProfilePopup && (
         <ProfileCompletionPopup
           user={user}

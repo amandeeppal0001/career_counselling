@@ -214,7 +214,7 @@ export const logoutUser = asyncHandler(async (req, res) => {
         req.user._id,
         {
             $unset: { 
-                 refreshToken: 1   
+            refreshToken: 1   
             },
         },
         {
@@ -241,7 +241,7 @@ export const getProfile = asyncHandler(  async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const profile = await UserProfile.findOne({ userId: new mongoose.Types.ObjectId(userId) });
+    const profile = await UserProfile.findOne({ userId: new mongoose.Types.ObjectId(userId) });
 
     if (!profile) {
       console.log("No profile found for userId:", userId);

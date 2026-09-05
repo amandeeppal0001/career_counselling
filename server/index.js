@@ -12,6 +12,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import userRoutes from "./routes/users.js";
 import exploreCollegeRoutes from "./routes/exploreCollegeRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 import cookieParser from "cookie-parser";
 import http from "http";
 import { Server } from "socket.io";
@@ -100,8 +101,9 @@ app.use("/api/college", exploreCollegeRoutes);
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/payments', paymentRoutes);
 
-// Global Error Handler
+
 app.use((err, req, res, next) => {
     console.error("Global Error Handler:", err);
     const statusCode = err.statusCode || 500;

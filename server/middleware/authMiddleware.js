@@ -16,7 +16,7 @@ import  User  from "../models/user.js";
     console.log("Token found:", token ? "YES" : "NO");
 
          if (!token){
-            console.log("❌ No token found in cookies or headers");
+            console.log(" No token found in cookies or headers");
             throw new ApiError(401,"Unauthorized request")
          }
 

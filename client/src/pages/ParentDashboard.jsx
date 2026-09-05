@@ -117,7 +117,7 @@ export default function ParentDashboard() {
           </p>
         </div>
 
-        {/* Child Overview Cards */}
+        {}
         <div className="mb-8">
           <h3 className="text-xl font-semibold mb-4">Your Children</h3>
           <div className="grid gap-6">
@@ -173,7 +173,7 @@ export default function ParentDashboard() {
           </div>
         </div>
 
-        {/* Main Content Tabs */}
+        {}
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -182,10 +182,10 @@ export default function ParentDashboard() {
             <TabsTrigger value="resources">Resources</TabsTrigger>
           </TabsList>
 
-          {/* Overview Tab */}
+          {}
           <TabsContent value="overview" className="space-y-6">
             <div className="grid lg:grid-cols-2 gap-6">
-              {/* Upcoming Events */}
+              {}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -213,7 +213,7 @@ export default function ParentDashboard() {
                 </CardContent>
               </Card>
 
-              {/* Quick Actions */}
+              {}
               <Card>
                 <CardHeader>
                   <CardTitle>Quick Actions</CardTitle>
@@ -243,7 +243,7 @@ export default function ParentDashboard() {
             </div>
           </TabsContent>
 
-          {/* Progress Tracking Tab */}
+          {}
           <TabsContent value="progress" className="space-y-6">
             <div>
               <h3 className="text-2xl font-bold font-[var(--font-playfair)] mb-2">Progress Tracking</h3>
@@ -282,7 +282,7 @@ export default function ParentDashboard() {
             </Card>
           </TabsContent>
 
-          {/* Communication Tab */}
+          {}
           <TabsContent value="communication" className="space-y-6">
             <div>
               <h3 className="text-2xl font-bold font-[var(--font-playfair)] mb-2">Communication Hub</h3>
@@ -353,7 +353,7 @@ export default function ParentDashboard() {
             </div>
           </TabsContent>
 
-          {/* Resources Tab */}
+          {}
           <TabsContent value="resources" className="space-y-6">
             <div>
               <h3 className="text-2xl font-bold font-[var(--font-playfair)] mb-2">Parent Resources</h3>

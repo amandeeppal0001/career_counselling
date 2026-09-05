@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose';
 
 const appointmentSchema = new mongoose.Schema({
@@ -24,15 +23,29 @@ const appointmentSchema = new mongoose.Schema({
     notes: { 
         type: String
     },
-    endTime: { type: Date, required: true },
-
+    endTime: { 
+        type: Date, 
+        required: true 
+    },
     mode: { 
         type: String,
         enum: ['Online', 'In-person'],
         default: 'Online'
+    },
+    payment: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Payment'
+    },
+    paymentStatus: {
+        type: String,
+        enum: ['Pending', 'Paid', 'Failed', 'Refunded', 'Free'],
+        default: 'Pending'
+    },
+    amountPaid: {
+        type: Number,
+        default: 0
     }
 }, { timestamps: true });
-
 
 appointmentSchema.index({ counselor: 1, appointmentTime: 1 }, { unique: true });
 

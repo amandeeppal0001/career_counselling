@@ -38,9 +38,7 @@ router.post("/complete-counsellor-profile", async (req, res) => {
 router.get("/profile/:userId", async (req, res) => {
   try {
     const { userId } = req.params
-
     const profile = await UserProfile.findOne({ userId: new mongoose.Types.ObjectId(userId) })
-
     if (!profile) {
       console.log("No profile found for userId:", userId)
       return res.status(404).json({ message: "Profile not found" })

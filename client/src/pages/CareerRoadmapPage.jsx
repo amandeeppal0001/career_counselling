@@ -191,101 +191,6 @@ const createFlowNodes = (roadmapData) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
 const createFlowEdges = (roadmapData) => {
     return roadmapData.slice(0, -1).map((_, index) => ({
       id: `e${index + 1}-${index + 2}`,
@@ -498,7 +403,7 @@ const handleSubmit = async (e) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -518,7 +423,7 @@ const handleSubmit = async (e) => {
         </div>
       </header>
 
-      {/* Roadmap Visualization */}
+      {}
       <main className="h-[calc(100vh-4rem)]">
         <ReactFlow
           nodes={nodes}

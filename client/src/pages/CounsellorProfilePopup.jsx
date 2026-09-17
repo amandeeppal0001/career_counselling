@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { API_BASE_URL } from "../config"
 
 const CounsellorProfilePopup = ({ user, onComplete, onClose }) => {
   const [currentStep, setCurrentStep] = useState(0)
@@ -118,45 +119,59 @@ const CounsellorProfilePopup = ({ user, onComplete, onClose }) => {
     }
   }
 
- const handleSubmit = async () => {
-  setIsSubmitting(true)
-  try {
-    const payload = {
-      userId: user._id,
-      ...formData,
-      experience: Number(formData.experience),
-      consultationFee: Number(formData.consultationFee),
-      profileCompleted: true,
-    };
+  const handleSubmit = async () => {
+    setIsSubmitting(true)
+    try {
+      const activeUserId = user?._id || JSON.parse(localStorage.getItem("user") || "{}")?._id;
 
-    console.log("Counsellor payload:", payload);
+      const payload = {
+        userId: activeUserId,
+        ...formData,
+        experience: Number(formData.experience) || 0,
+        consultationFee: Number(formData.consultationFee) || 0,
+        profileCompleted: true,
+      };
 
-    const response = await fetch(
-      "https://career-counselling-nr04.onrender.com/api/users/complete-counsellor-profile",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: 'include',
-        body: JSON.stringify(payload),
+      console.log("Counsellor payload:", payload);
+
+      const token = localStorage.getItem("accessToken");
+      const headers = { "Content-Type": "application/json" };
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
       }
-    );
 
-    if (response.ok) {
-      const profileData = await response.json();
-      onComplete(profileData);
-    } else {
-      const err = await response.json();
-      console.error("Failed to save counsellor profile:", err);
-      alert("Failed to save profile. Check console for details.");
+      const response = await fetch(
+        `${API_BASE_URL}/api/users/complete-counsellor-profile`,
+        {
+          method: "POST",
+          headers,
+          credentials: 'include',
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const profileData = data.profile || data;
+
+        // Update user in localStorage
+        const stored = JSON.parse(localStorage.getItem("user") || "{}");
+        const updatedUser = { ...stored, ...(user || {}), profileCompleted: true };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
+        onComplete(profileData);
+      } else {
+        const err = await response.json();
+        console.error("Failed to save counsellor profile:", err);
+        alert("Failed to save profile. Check console for details.");
+        setIsSubmitting(false)
+      }
+    } catch (error) {
+      console.error("Error saving counsellor profile:", error);
+      alert("Error saving profile. Please try again.");
       setIsSubmitting(false)
     }
-  } catch (error) {
-    console.error("Error saving counsellor profile:", error);
-    alert("Error saving profile. Please try again.");
-    setIsSubmitting(false)
-  }
-};
-
+  };
 
   const renderStepContent = () => {
     switch (currentStep) {

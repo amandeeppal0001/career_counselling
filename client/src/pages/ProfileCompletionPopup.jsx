@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios'; 
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
+
 const ProfileCompletionPopup = ({ user, onComplete, onClose }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const navigator = useNavigate();
@@ -57,30 +59,52 @@ const ProfileCompletionPopup = ({ user, onComplete, onClose }) => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-     console.log("User in profile popup:", user);
-     console.log("formdata", formData);
+      console.log("User in profile popup:", user);
+      console.log("formdata", formData);
 
-const response = await axios.patch(
-    'https://career-counselling-nr04.onrender.com/api/users/completeProfile',
-    {
+      const token = localStorage.getItem("accessToken");
+      const headers = {
+        "Content-Type": "application/json",
+      };
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const activeUserId = user?._id || JSON.parse(localStorage.getItem("user") || "{}")?._id;
+
+      const payload = {
         ...formData,
+        userId: activeUserId,
+        age: Number(formData.age) || 18,
         profileCompleted: true,
-    },
-    {
-        withCredentials: true,
-        headers: {
-            "Content-Type": "application/json",
-        },
-    }
-);
-      console.log(response);
+      };
 
-   if (response.status === 200) {
-        const profileData = response.data.data;
-        onComplete(profileData);
-        navigator('/student-dashboard'); 
+      const response = await axios.patch(
+        `${API_BASE_URL}/api/users/completeProfile`,
+        payload,
+        {
+          withCredentials: true,
+          headers,
+        }
+      );
+      console.log("Profile completion response:", response);
+
+      if (response.status === 200 || response.status === 201) {
+        const profileData = response.data.data || response.data;
+        
+        // Update user in localStorage
+        const stored = JSON.parse(localStorage.getItem("user") || "{}");
+        const updatedUser = { ...stored, ...(user || {}), profileCompleted: true };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
+        if (onComplete) {
+          onComplete(profileData);
+        }
+
+        if (window.location.pathname !== '/student-dashboard') {
+          navigator('/student-dashboard', { state: { user: updatedUser } });
+        }
       } else {
-        console.log(formData);
         alert('Failed to save profile. Please try again.');
         setIsSubmitting(false);
       }

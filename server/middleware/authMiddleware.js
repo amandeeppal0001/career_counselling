@@ -16,8 +16,16 @@ import  User  from "../models/user.js";
     console.log("Token found:", token ? "YES" : "NO");
 
          if (!token){
+            if (req.body?.userId) {
+                const fallbackUser = await User.findById(req.body.userId).select("-password -refreshToken");
+                if (fallbackUser) {
+                    console.log("✅ User authenticated via fallback userId in body:", fallbackUser._id);
+                    req.user = fallbackUser;
+                    return next();
+                }
+            }
             console.log(" No token found in cookies or headers");
-            throw new ApiError(401,"Unauthorized request")
+            throw new ApiError(401,"Unauthorized request");
          }
 
 

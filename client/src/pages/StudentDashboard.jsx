@@ -5,19 +5,21 @@
 import { useState, useEffect } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import ProfileCompletionPopup from "./ProfileCompletionPopup"
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://career-counselling-nr04.onrender.com"
+import { API_BASE_URL } from "../config"
 
 const StudentDashboard = ({ onLogout }) => {
   const location = useLocation()
   const navigate = useNavigate()
 
   const [user, setUser] = useState(() => {
-    return location.state?.user || JSON.parse(localStorage.getItem("user")) || null
+    return location.state?.user || JSON.parse(localStorage.getItem("user") || "null") || null
   })
 
   const [showProfilePopup, setShowProfilePopup] = useState(false)
-  const [profileCompleted, setProfileCompleted] = useState(false)
+  const [profileCompleted, setProfileCompleted] = useState(() => {
+    const initialUser = location.state?.user || JSON.parse(localStorage.getItem("user") || "null")
+    return Boolean(initialUser?.profileCompleted)
+  })
   const [userProfile, setUserProfile] = useState(null)
   const [appointments, setAppointments] = useState([])
   const [showPastAppointments, setShowPastAppointments] = useState(false)
@@ -54,31 +56,41 @@ const StudentDashboard = ({ onLogout }) => {
       try {
         console.log("🟢 Fetching profile for userId:", user._id)
 
+        const token = localStorage.getItem("accessToken");
+        const headers = {};
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+
         const response = await fetch(`${API_BASE_URL}/api/users/profile/${user._id}`, {
+          headers,
           credentials: 'include'
         })
         console.log("🔵 Fetch response status:", response.status)
 
         if (!response.ok) {
-          console.warn("⚠ No profile found, showing popup.")
-          setShowProfilePopup(true)
+          if (response.status === 404 && !profileCompleted && !user?.profileCompleted) {
+            console.warn("⚠ No profile found, showing popup.")
+            setShowProfilePopup(true)
+          }
           return
         }
 
         const profile = await response.json()
         console.log("✅ Fetched profile data from backend:", profile)
 
-        if (profile && profile.profileCompleted) {
+        if (profile && (profile.profileCompleted || profile._id)) {
           console.log("🎉 Profile marked completed in DB.")
           setUserProfile(profile)
           setProfileCompleted(true)
-        } else {
+          setShowProfilePopup(false)
+        } else if (!profileCompleted && !user?.profileCompleted) {
           console.warn("⚠ Profile exists but profileCompleted=false.")
           setShowProfilePopup(true)
         }
       } catch (error) {
         console.error("🔥 Error checking profile:", error)
-        setShowProfilePopup(true)
+        if (!profileCompleted && !user?.profileCompleted) {
+          setShowProfilePopup(true)
+        }
       }
     }
 
@@ -98,10 +110,10 @@ const StudentDashboard = ({ onLogout }) => {
 
     checkProfileCompletion()
     fetchAppointments()
-  }, [user])
+  }, [user?._id])
 
   useEffect(() => {
-    if (activeTab === "messages" && user) {
+    if (activeTab === "messages" && user?._id) {
       const fetchConversations = async () => {
         try {
           const response = await fetch(`${API_BASE_URL}/api/messages/conversations/${user._id}`)
@@ -115,7 +127,7 @@ const StudentDashboard = ({ onLogout }) => {
       }
       fetchConversations()
     }
-  }, [activeTab, user])
+  }, [activeTab, user?._id])
 
   const handleProfileComplete = (profileData) => {
     console.log("✅ Profile completed in popup. Saving to state:", profileData)
@@ -280,7 +292,7 @@ const StudentDashboard = ({ onLogout }) => {
   
                 onClick={async () => {
                   try {
-                    await fetch("https://career-counselling-nr04.onrender.com/api/users/logout", {
+                    await fetch(`${API_BASE_URL}/api/users/logout`, {
                       method: "POST",
                       credentials: "include"
                     });
@@ -288,6 +300,7 @@ const StudentDashboard = ({ onLogout }) => {
                     console.error("Logout failed:", error);
                   } finally {
                     localStorage.removeItem("user");
+                    localStorage.removeItem("accessToken");
                     setUser(null);
                     navigate("/");
                     if (onLogout) onLogout();

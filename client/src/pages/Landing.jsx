@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { GraduationCap, Users, UserCheck, ArrowRight, BookOpen, Target, TrendingUp } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import ProfileCompletionPopup from "./ProfileCompletionPopup"
+import { API_BASE_URL } from "../config"
 
 export default function LandingPage() {
     const [isSignUp, setIsSignUp] = useState(false)
@@ -43,7 +44,7 @@ export default function LandingPage() {
         setIsLoading(true);
 
         try {
-            const res = await axios.post("https://career-counselling-nr04.onrender.com/api/users/login", {
+            const res = await axios.post(`${API_BASE_URL}/api/users/login`, {
                 email,
                 password,
             }, {
@@ -53,8 +54,13 @@ export default function LandingPage() {
             console.log("✅ Sign-in successful:", res.data);
 
             const loggedInUser = res.data.data.user; 
+            const accessToken = res.data.data.accessToken;
+
             setUser(loggedInUser);
             localStorage.setItem("user", JSON.stringify(loggedInUser));
+            if (accessToken) {
+                localStorage.setItem("accessToken", accessToken);
+            }
 
             if (loggedInUser.role === "student") {
                 navigate("/student-dashboard", { state: { user: loggedInUser } });
@@ -79,7 +85,7 @@ export default function LandingPage() {
         setIsLoading(true);
 
         try {
-            const res = await axios.post("https://career-counselling-nr04.onrender.com/api/users/signup", {
+            const res = await axios.post(`${API_BASE_URL}/api/users/signup`, {
                 name,
                 email,
                 password,
@@ -95,9 +101,13 @@ export default function LandingPage() {
             alert("User data saved successfully!");
 
             const newUser = res.data.data.user; 
-            setUser(newUser);
+            const accessToken = res.data.data.accessToken;
 
+            setUser(newUser);
             localStorage.setItem("user", JSON.stringify(newUser));
+            if (accessToken) {
+                localStorage.setItem("accessToken", accessToken);
+            }
 
             if (newUser.role === "student") {
                 setShowProfilePopup(true);
@@ -396,7 +406,10 @@ export default function LandingPage() {
                     user={user}
                     onComplete={(profile) => {
                         setShowProfilePopup(false);
-                        navigate("/student-dashboard", { state: { user } }); 
+                        const updatedUser = { ...user, profileCompleted: true };
+                        localStorage.setItem("user", JSON.stringify(updatedUser));
+                        setUser(updatedUser);
+                        navigate("/student-dashboard", { state: { user: updatedUser } }); 
                     }}
                     onClose={() => setShowProfilePopup(false)}
                 />

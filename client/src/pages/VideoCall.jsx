@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import { API_BASE_URL } from '../config';
 
 const VideoCall = () => {
   const { roomId } = useParams();
@@ -25,7 +26,7 @@ const VideoCall = () => {
 
   useEffect(() => {
     let isMounted = true;
-    const socket = io('https://career-counselling-nr04.onrender.com');
+    const socket = io(API_BASE_URL);
     socketRef.current = socket;
     const myId = myIdRef.current;
 

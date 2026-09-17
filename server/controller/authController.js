@@ -95,28 +95,41 @@ export const registerUser = asyncHandler(async (req, res) => {
 
 
 export const createOrUpdateProfile = asyncHandler(async (req, res) => {
+    const userId = req.user?._id || req.body?.userId;
 
-    const userId = req.user._id;
-
-    console.log("userId from JWT:", userId);
+    console.log("userId for profile update:", userId);
 
     if (!userId) {
         throw new ApiError(401, "Unauthorized: No user ID provided.");
     }
 
+    const profileData = {
+        ...req.body,
+        userId: userId,
+        age: req.body.age ? Number(req.body.age) : 18,
+        profileCompleted: true,
+    };
 
     const updatedProfile = await UserProfile.findOneAndUpdate(
         { userId: userId }, 
-        { ...req.body, userId: userId }, 
+        profileData, 
         {
             new: true, 
             upsert: true, 
-            runValidators: true 
+            setDefaultsOnInsert: true,
+            runValidators: false 
         }
     );
 
     if (!updatedProfile) {
         throw new ApiError(404, "Profile could not be found or created.");
+    }
+
+    // Also mark user as having profile completed
+    try {
+        await User.findByIdAndUpdate(userId, { profileCompleted: true });
+    } catch (err) {
+        console.warn("Could not update User.profileCompleted flag:", err.message);
     }
 
     res.status(200).json(new ApiResponse(200, updatedProfile, "Profile updated successfully."));
@@ -237,19 +250,26 @@ export const logoutUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
 
-export const getProfile = asyncHandler(  async (req, res) => {
-  try {
-    const { userId } = req.params;
+export const getProfile = asyncHandler(  async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (!userId || userId === 'undefined' || userId === 'null') {
+      return res.status(400).json({ error: 'Invalid or missing userId' });
+    }
 
-    const profile = await UserProfile.findOne({ userId: new mongoose.Types.ObjectId(userId) });
+    const query = mongoose.Types.ObjectId.isValid(userId)
+      ? { userId: new mongoose.Types.ObjectId(userId) }
+      : { userId };
 
-    if (!profile) {
-      console.log("No profile found for userId:", userId);
-      return res.status(404).json({ message: 'Profile not found' });
-    }
+    const profile = await UserProfile.findOne(query);
 
-    console.log("Fetched profile from DB:", profile);
-    res.json(profile);
+    if (!profile) {
+      console.log("No profile found for userId:", userId);
+      return res.status(404).json({ message: 'Profile not found' });
+    }
+
+    console.log("Fetched profile from DB:", profile);
+    res.json(profile);
   } catch (error) {
     console.error('Error fetching profile:', error);
     res.status(500).json({ error: 'Failed to fetch profile' });

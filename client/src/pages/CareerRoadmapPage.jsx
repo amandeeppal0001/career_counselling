@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"
 import ReactFlow, { MiniMap, Controls, Background, useNodesState, useEdgesState, addEdge, MarkerType } from "reactflow"
 import "reactflow/dist/style.css"
 import axios from 'axios';
+import { API_BASE_URL } from "../config";
 
 const CareerRoadmapPage = () => {
   const navigate = useNavigate()
@@ -220,15 +221,15 @@ const handleSubmit = async (e) => {
     setLoading(true)
 
 
-    try {
-      const response = await axios.post("https://career-counselling-nr04.onrender.com/api/college/roadmap", {
-            formData
-        }, {
-            headers: {
-                "Content-Type": "application/json"
-            },
-            withCredentials: true
-        });
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/college/roadmap`, {
+            formData
+        }, {
+            headers: {
+                "Content-Type": "application/json"
+            },
+            withCredentials: true
+        });
                 
       
       const responseData = response.data;

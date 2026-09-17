@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { type: String, required: true },
   refreshToken: String, 
+  profileCompleted: { type: Boolean, default: false },
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

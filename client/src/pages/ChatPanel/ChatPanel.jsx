@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import { API_BASE_URL } from "../../config";
 
 function ChatPanel() {
   const [messages, setMessages] = useState([]);
@@ -18,34 +19,43 @@ function ChatPanel() {
     const formData = location.state?.formData;
 
     if (startData && startData.sessionId && startData.question && startData.options && formData) {
-      const initialMessage = {
-        sender: "bot",
-        text: startData.question,
-        options: startData.options,
-        type: "mcq"
-      };
-
-      setMessages([initialMessage]);
       setSessionId(startData.sessionId);
       setUserFormData(formData);
+      setMessages([
+        {
+          sender: "bot",
+          text: startData.question,
+          options: startData.options,
+          type: "mcq",
+        },
+      ]);
     } else {
-      console.error("No career guidance data found. Redirecting...");
-      navigate("/select");
+      setMessages([
+        {
+          sender: "bot",
+          text: "Welcome! Please start the session from the selection page.",
+          type: "text",
+        },
+      ]);
     }
-  }, [location.state, navigate]);
-
+  }, [location.state]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isLoading]);
 
+  const handleOptionSelect = (option) => {
+    setSelectedOption(option);
+  };
 
   const handleSendMessage = async (selectedAnswer) => {
-    const userAnswer = selectedAnswer || selectedOption;
-    if (!userAnswer || isLoading || !sessionId) return;
+    if (selectedAnswer && typeof selectedAnswer === 'object' && typeof selectedAnswer.preventDefault === 'function') {
+      selectedAnswer.preventDefault();
+    }
+    const userAnswer = typeof selectedAnswer === 'string' ? selectedAnswer : selectedOption;
+    if (!userAnswer || !sessionId || isLoading) return;
 
     setMessages((prev) => [...prev, { sender: "user", text: userAnswer }]);
     setSelectedOption("");
@@ -53,7 +63,7 @@ function ChatPanel() {
 
     try {
       const resultResponse= await fetch(
-        "https://career-counselling-nr04.onrender.com/api/interviews/evaluate",
+        `${API_BASE_URL}/api/interviews/evaluate`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -93,7 +103,7 @@ function ChatPanel() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        "https://career-counselling-nr04.onrender.com/api/interviews/summary",
+        `${API_BASE_URL}/api/interviews/summary`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

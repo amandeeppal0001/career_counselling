@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
+import { API_BASE_URL } from '../config';
 
-const SOCKET_URL = 'https://career-counselling-nr04.onrender.com';
+const SOCKET_URL = API_BASE_URL;
 
 function Message({ user: propUser }) {
   const { id: otherUserId } = useParams();

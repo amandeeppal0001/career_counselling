@@ -2,6 +2,7 @@ import { useState,useEffect , Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import { Listbox, Transition } from "@headlessui/react";
 import { IoMdArrowDropdown } from "react-icons/io";
+import { API_BASE_URL } from "../../config";
 
 import Logo from "../../assets/logoix.png";
 
@@ -25,7 +26,7 @@ function Select() {
     e.preventDefault();
 
     try {
-      const response = await fetch("https://career-counselling-nr04.onrender.com/api/interviews/start", {
+      const response = await fetch(`${API_BASE_URL}/api/interviews/start`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

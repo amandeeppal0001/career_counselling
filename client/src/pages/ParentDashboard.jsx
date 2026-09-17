@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { API_BASE_URL } from "../config"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
@@ -85,7 +86,7 @@ export default function ParentDashboard() {
                 size="sm"
                 onClick={async () => {
                   try {
-                    await fetch("https://career-counselling-nr04.onrender.com/api/users/logout", {
+                    await fetch(`${API_BASE_URL}/api/users/logout`, {
                       method: "POST",
                       credentials: "include"
                     });
@@ -93,6 +94,7 @@ export default function ParentDashboard() {
                     console.error("Logout failed:", error);
                   } finally {
                     localStorage.removeItem("user");
+                    localStorage.removeItem("accessToken");
                     navigate("/");
                   }
                 }}

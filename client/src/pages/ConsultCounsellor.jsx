@@ -23,28 +23,29 @@ const ConsultCounsellor = () => {
   const [selectedSpecialization, setSelectedSpecialization] = useState("")
   const [followedCounsellors, setFollowedCounsellors] = useState(new Set())
 
-  useEffect(() => {
-    const fetchCounsellors = async () => {
-      try {
-        setLoading(true)
-       const response = await fetch(`${API_BASE_URL}/api/users/counsellors/all`, {
-         credentials: 'include'
-       });
+  const fetchCounsellors = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const response = await fetch(`${API_BASE_URL}/api/users/counsellors/all`, {
+        credentials: 'include'
+      });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch counsellors")
-        }
-
-        const data = await response.json()
-        setCounsellors(data)
-      } catch (err) {
-        console.error("Error fetching counsellors:", err)
-        setError(err.message)
-      } finally {
-        setLoading(false)
+      if (!response.ok) {
+        throw new Error(`Failed to load counsellors (HTTP ${response.status})`)
       }
-    }
 
+      const data = await response.json()
+      setCounsellors(Array.isArray(data) ? data : [])
+    } catch (err) {
+      console.error("Error fetching counsellors:", err)
+      setError(err.message || "Failed to fetch")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
     fetchCounsellors()
   }, [])
 
@@ -81,8 +82,7 @@ const ConsultCounsellor = () => {
   }
 
   const handleViewProfile = (counsellorId) => {
-
-    navigate(`/counsellor-profile/${counsellorId}`, { state: { user } })
+    navigate(`/book-appointment/${counsellorId}`, { state: { user } })
   }
 
   if (!user) {
@@ -182,13 +182,25 @@ const ConsultCounsellor = () => {
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
-            <div className="flex">
-              <div className="text-red-400 text-xl mr-3">⚠️</div>
-              <div>
-                <h3 className="text-red-800 font-medium">Error loading counsellors</h3>
-                <p className="text-red-600 text-sm mt-1">{error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-xl p-5 mb-8 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start space-x-3">
+                <div className="text-red-500 text-2xl flex-shrink-0">⚠️</div>
+                <div>
+                  <h3 className="text-red-800 font-semibold text-base">Error loading counsellors</h3>
+                  <p className="text-red-600 text-sm mt-1">
+                    {error === "Failed to fetch"
+                      ? `Unable to connect to the backend server (${API_BASE_URL}). Please verify that your backend server is running on port 5002, or if using a remote service (Render), wait a moment for it to wake up.`
+                      : error}
+                  </p>
+                </div>
               </div>
+              <button
+                onClick={fetchCounsellors}
+                className="self-start sm:self-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center shadow-sm flex-shrink-0 cursor-pointer"
+              >
+                🔄 Retry
+              </button>
             </div>
           </div>
         )}
@@ -243,7 +255,11 @@ const ConsultCounsellor = () => {
                         {counsellor.qualifications && (
                           <div>
                             <h4 className="font-semibold text-gray-900 mb-2">Qualifications</h4>
-                            <p className="text-gray-600 text-sm">{counsellor.qualifications}</p>
+                            <p className="text-gray-600 text-sm">
+                              {Array.isArray(counsellor.qualifications)
+                                ? counsellor.qualifications.join(", ")
+                                : counsellor.qualifications}
+                            </p>
                           </div>
                         )}
 

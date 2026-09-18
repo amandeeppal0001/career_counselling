@@ -30,6 +30,8 @@ const BookAppointment = () => {
   const [bookingSuccessData, setBookingSuccessData] = useState(null)
   const [bookedAppointments, setBookedAppointments] = useState([])
   const [fetchingAppointments, setFetchingAppointments] = useState(false)
+  const [copiedCard, setCopiedCard] = useState(false)
+  const [copiedUpi, setCopiedUpi] = useState(false)
 
   const getAvailableDates = () => {
     const dates = []
@@ -539,6 +541,91 @@ const BookAppointment = () => {
                   />
                 </div>
 
+                {/* Razorpay Test Mode Guidance Card */}
+                <div className="bg-gradient-to-br from-purple-50 via-indigo-50/70 to-blue-50 border-2 border-purple-200/90 rounded-2xl p-5 shadow-sm">
+                  <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
+                    <div className="flex items-center space-x-2">
+                      <span className="flex h-2.5 w-2.5 relative">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                      </span>
+                      <span className="font-bold text-xs uppercase tracking-wider text-purple-900">
+                        🧪 Razorpay Test Mode Active
+                      </span>
+                    </div>
+                    <span className="text-[11px] bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
+                      ✓ No Real Money Required
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-gray-600 mb-3">
+                    This booking uses simulated payments for demonstration. Select any test option in the Razorpay popup:
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {/* Option 1: Netbanking (Fastest 1-Click) */}
+                    <div className="bg-white rounded-xl p-3 border border-purple-100 shadow-sm flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center space-x-1.5 font-bold text-xs text-purple-900 mb-1">
+                          <span>⚡</span>
+                          <span>Fastest (1-Click): Netbanking</span>
+                        </div>
+                        <p className="text-gray-600 text-[11px] leading-relaxed">
+                          In the popup, choose <strong>Netbanking</strong> → pick any bank → click the green <strong>"Success"</strong> button. Done in 3 seconds!
+                        </p>
+                      </div>
+                      <div className="mt-2 text-[10px] text-emerald-700 font-medium">
+                        ⭐ Recommended for quick testing
+                      </div>
+                    </div>
+
+                    {/* Option 2: Test Card */}
+                    <div className="bg-white rounded-xl p-3 border border-purple-100 shadow-sm">
+                      <div className="flex items-center justify-between font-bold text-xs text-purple-900 mb-1">
+                        <span className="flex items-center space-x-1">
+                          <span>💳</span>
+                          <span>Test Card Details</span>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText("5555510000081006")
+                            setCopiedCard(true)
+                            setTimeout(() => setCopiedCard(false), 2000)
+                          }}
+                          className="text-[10px] bg-purple-100 hover:bg-purple-200 text-purple-800 font-semibold px-2 py-0.5 rounded transition cursor-pointer"
+                        >
+                          {copiedCard ? "✓ Copied!" : "📋 Copy Card"}
+                        </button>
+                      </div>
+
+                      <div className="space-y-0.5 text-[11px] text-gray-700 font-mono">
+                        <div><span className="text-gray-500 font-sans">Number:</span> 5555 5100 0008 1006</div>
+                        <div><span className="text-gray-500 font-sans">Expiry:</span> Any future (e.g. 12/28)</div>
+                        <div><span className="text-gray-500 font-sans">CVV / OTP:</span> Any (e.g. 123 / 123456)</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Option 3: UPI simulation pill */}
+                  <div className="mt-2.5 bg-white/70 rounded-lg px-3 py-1.5 border border-purple-100 flex items-center justify-between text-[11px]">
+                    <span className="text-gray-600">
+                      📱 Or use UPI ID: <strong className="font-mono text-purple-900">success@razorpay</strong>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText("success@razorpay")
+                        setCopiedUpi(true)
+                        setTimeout(() => setCopiedUpi(false), 2000)
+                      }}
+                      className="text-[10px] text-purple-700 hover:text-purple-900 font-medium underline ml-2 cursor-pointer"
+                    >
+                      {copiedUpi ? "✓ Copied!" : "Copy"}
+                    </button>
+                  </div>
+                </div>
+
                 {/* Submit / Pay Button */}
                 <button
                   onClick={handleBooking}
@@ -546,7 +633,7 @@ const BookAppointment = () => {
                   className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg ${
                     isBooking || !selectedDate || !selectedTime
                       ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 text-white hover:from-purple-700 hover:to-indigo-700 hover:shadow-xl transform hover:-translate-y-0.5"
+                      : "bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 text-white hover:from-purple-700 hover:to-indigo-700 hover:shadow-xl transform hover:-translate-y-0.5 cursor-pointer"
                   }`}
                 >
                   {isBooking ? (
@@ -556,13 +643,13 @@ const BookAppointment = () => {
                     </>
                   ) : (
                     <>
-                      <span>🔒 Pay ₹{feeAmount} & Confirm Booking</span>
+                      <span>🔒 Pay ₹{feeAmount} & Confirm Booking (Demo)</span>
                     </>
                   )}
                 </button>
 
                 <p className="text-center text-xs text-gray-500">
-                  💡 By clicking pay, you will be securely redirected to Razorpay checkout.
+                  💡 Razorpay Test Mode: No real transaction will take place. Your bank account is 100% safe.
                 </p>
               </div>
             </div>

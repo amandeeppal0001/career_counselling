@@ -125,9 +125,28 @@ function ChatPanel() {
 
   return (
     <main className="flex-grow bg-white p-6 ml-20">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">
-        Career Guidance Session
-      </h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-gray-100">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+            Career Guidance Session
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+            Answer the scenario questions to evaluate your fit and receive a customized roadmap.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            if (window.confirm("Exit assessment and return to your dashboard? Progress will not be saved.")) {
+              navigate("/student-dashboard");
+            }
+          }}
+          className="self-start sm:self-center px-4 py-2 text-xs sm:text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-red-50 hover:text-red-700 hover:border-red-200 border border-gray-200 rounded-xl transition flex items-center space-x-1.5 cursor-pointer flex-shrink-0"
+        >
+          <span>✕</span>
+          <span>Exit to Dashboard</span>
+        </button>
+      </div>
 
       <div
         ref={chatContainerRef}
@@ -179,7 +198,7 @@ function ChatPanel() {
                             name={`question-${index}`}
                             value={option}
                             checked={selectedOption === option}
-                            onChange={(e) => setSelectedOption(e.target.value)}
+                            onChange={() => handleOptionSelect(option)}
                             className="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                             disabled={isLoading}
                           />

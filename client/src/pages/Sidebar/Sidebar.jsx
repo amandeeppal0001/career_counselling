@@ -34,10 +34,12 @@ const Cog6ToothIcon = (props) => (
 
 
 function Sidebar() {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const dashboardLink = user?.role === "counselor" ? "/counselor-dashboard" : user?.role === "parent" ? "/parent-dashboard" : "/student-dashboard";
+
   const navItems = [
     { name: 'Home', icon: HomeIcon, link: '/' },
-    { name: 'Dashboard', icon: ChartBarIcon, link: '/dashboard' },
-    { name: 'Profile', icon: UserIcon, link: '/profile' },
+    { name: 'Dashboard', icon: ChartBarIcon, link: dashboardLink },
   ];
 
   return (

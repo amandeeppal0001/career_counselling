@@ -53,13 +53,13 @@ export const openRazorpayModal = async ({
     key: key,
     amount: orderData.amount,
     currency: orderData.currency || "INR",
-    name: "Career Guidance Consultation",
-    description: `1-on-1 Counseling Session with ${counsellor?.fullName || 'Counselor'}`,
+    name: "Career Guidance (Demo / Test Mode)",
+    description: `[TEST MODE] 1-on-1 Counseling with ${counsellor?.fullName || 'Counselor'} (No real money charged)`,
     order_id: orderData.orderId,
     prefill: {
-      name: user?.name || "",
-      email: user?.email || "",
-      contact: user?.phoneNumber || counsellor?.phoneNumber || ""
+      name: user?.name || "Test Student",
+      email: user?.email || "test@example.com",
+      contact: user?.phoneNumber || counsellor?.phoneNumber || "9876543210"
     },
     notes: {
       studentId: user?._id || "",

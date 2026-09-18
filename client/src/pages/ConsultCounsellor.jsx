@@ -190,7 +190,7 @@ const ConsultCounsellor = () => {
                   <h3 className="text-red-800 font-semibold text-base">Error loading counsellors</h3>
                   <p className="text-red-600 text-sm mt-1">
                     {error === "Failed to fetch"
-                      ? `Unable to connect to the backend server (${API_BASE_URL}). Please verify that your backend server is running on port 5002, or if using a remote service (Render), wait a moment for it to wake up.`
+                      ? `Unable to connect to the backend server (${API_BASE_URL}). If using a free remote service (Render), please wait a moment for the instance to wake up and click Retry.`
                       : error}
                   </p>
                 </div>

@@ -1,4 +1,5 @@
-
+import dotenv from "dotenv";
+dotenv.config();
 
 import express from "express";
 import mongoose from "mongoose";
@@ -9,7 +10,6 @@ import messageRoutes from './routes/messageRoutes.js'
 import counslerRoutes from "./routes/counsellorRoutes.js"; 
 import { Message } from './models/Message.js';
 import cors from "cors";
-import dotenv from "dotenv";
 import userRoutes from "./routes/users.js";
 import exploreCollegeRoutes from "./routes/exploreCollegeRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
@@ -17,7 +17,6 @@ import cookieParser from "cookie-parser";
 import http from "http";
 import { Server } from "socket.io";
 
-dotenv.config();
 const app = express();
 const server = http.createServer(app);
 const allowedOrigins = [

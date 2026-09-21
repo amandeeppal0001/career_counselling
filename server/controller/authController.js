@@ -10,7 +10,7 @@ import { asyncHandler } from '../utils/asyncHandler.js'
 import {ApiError} from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import UserProfile from '../models/UserProfile.js';
-
+import redisClient from '../utils/redis.js';
 
 const generateAccessAndRefereshTokens = async(userId) =>{
     try{
@@ -130,6 +130,14 @@ export const createOrUpdateProfile = asyncHandler(async (req, res) => {
         await User.findByIdAndUpdate(userId, { profileCompleted: true });
     } catch (err) {
         console.warn("Could not update User.profileCompleted flag:", err.message);
+    }
+
+    try {
+        if (redisClient.isOpen) {
+            await redisClient.setEx(`profile:${userId}`, 3600, JSON.stringify(updatedProfile));
+        }
+    } catch (err) {
+        console.warn("Redis update failed:", err);
     }
 
     res.status(200).json(new ApiResponse(200, updatedProfile, "Profile updated successfully."));
@@ -261,11 +269,31 @@ export const getProfile = asyncHandler(  async (req, res) => {
       ? { userId: new mongoose.Types.ObjectId(userId) }
       : { userId };
 
+    try {
+      if (redisClient.isOpen) {
+        const cachedProfile = await redisClient.get(`profile:${userId}`);
+        if (cachedProfile) {
+          console.log("Fetched profile from Redis");
+          return res.json(JSON.parse(cachedProfile));
+        }
+      }
+    } catch (err) {
+      console.warn("Redis cache error:", err);
+    }
+
     const profile = await UserProfile.findOne(query);
 
     if (!profile) {
       console.log("No profile found for userId:", userId);
       return res.status(404).json({ message: 'Profile not found' });
+    }
+
+    try {
+      if (redisClient.isOpen) {
+        await redisClient.setEx(`profile:${userId}`, 3600, JSON.stringify(profile));
+      }
+    } catch (err) {
+      console.warn("Redis cache error:", err);
     }
 
     console.log("Fetched profile from DB:", profile);
